@@ -99,3 +99,37 @@ SELECT * FROM v_period_dashboard WHERE code = '2026-10';
 
 -- 12. Chốt sổ chu kỳ (sinh lương theo công, chốt vào payrolls, khoá kỳ)
 -- SELECT fn_close_period('2026-10', 6);
+
+-- =====================================================================
+-- v1.2 · NHÂN SỰ & TÀI KHOẢN
+-- =====================================================================
+
+-- 13. Màn hình Nhân sự: danh sách + trạng thái tài khoản (locked / resigned tô đỏ)
+SELECT code, full_name, department_name, position_name, role, manager_name, work_status,
+       username, has_account, account_state, last_login_at
+FROM v_staff_directory ORDER BY department_code, position_level, code;
+
+-- 14. Cây phòng ban
+SELECT code, name, manager_name, headcount, probation, no_account, locked, position_count
+FROM v_department_headcount ORDER BY code;
+
+-- 15. Vị trí theo phòng ban
+SELECT d.name AS phong_ban, jp.code, jp.name, jp.level, jp.default_role, jp.description
+FROM job_positions jp JOIN departments d ON d.id = jp.department_id ORDER BY d.sort_order, jp.level;
+
+-- 16. Đăng nhập bằng tên đăng nhập (app gọi trước signInWithPassword)
+SELECT fn_login_email('TranThuHa');
+
+-- 17. Thêm nhân sự mới chỉ cần chọn vị trí: phòng ban + quyền tự điền (thử rồi huỷ)
+BEGIN;
+INSERT INTO staff (code, full_name, phone, job_position_id, hire_date, probation_end, work_status, username)
+SELECT 'NV-099', 'Nhân sự Thử', '0900 000 099', id, current_date, current_date + 60, 'probation', ' NhanSu.Thu '
+FROM job_positions WHERE code = 'VT-KTV'
+RETURNING code, role, department_id, username;
+ROLLBACK;
+
+-- 18. Khoá tài khoản (chạy trong SQL Editor hoặc backend có quyền Admin)
+-- SELECT fn_set_staff_lock((SELECT id FROM staff WHERE code = 'NV-002'), true, 'Nghi lộ mật khẩu');
+
+-- 19. Nghỉ việc: tài khoản tự ngừng hoạt động, giữ lịch sử
+-- UPDATE staff SET work_status = 'resigned', leave_date = '2026-10-31' WHERE code = 'NV-003';

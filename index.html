@@ -7,18 +7,18 @@
 :root{
   --bg:#f5f6f9; --surface:#ffffff; --sunk:#eceef4; --fg:#1b2030; --muted:#5b6275; --line:#d8dce6;
   --accent:#2c4c9c; --accent-soft:#e3e9f7; --warn:#9a5b00; --warn-soft:#fbf0dc; --bad:#a3322a; --bad-soft:#f8e3e0;
-  --ok:#2f6b3f; --ok-soft:#e2efe4; --info:#6a3f96; --info-soft:#efe7f7; --code-bg:#f0f2f6;
+  --ok:#2f6b3f; --ok-soft:#e2efe4; --info:#6a3f96; --info-soft:#efe7f7; --code-bg:#f0f2f6; --new:#c62828; --new-soft:#fdecea;
   --f-body:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#12151d; --surface:#1a1e28; --sunk:#222736; --fg:#e3e6ee; --muted:#9ba2b5; --line:#313849;
   --accent:#8eaaf0; --accent-soft:#1f2a45; --warn:#e3a94f; --warn-soft:#3a2d17; --bad:#ef8a80; --bad-soft:#3b211e;
-  --ok:#7fc08f; --ok-soft:#1f3326; --info:#c2a2ec; --info-soft:#2c2140; --code-bg:#1d2230; color-scheme:dark}}
+  --ok:#7fc08f; --ok-soft:#1f3326; --info:#c2a2ec; --info-soft:#2c2140; --code-bg:#1d2230; --new:#ff8a80; --new-soft:#3d1f1f; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#12151d; --surface:#1a1e28; --sunk:#222736; --fg:#e3e6ee; --muted:#9ba2b5; --line:#313849;
   --accent:#8eaaf0; --accent-soft:#1f2a45; --warn:#e3a94f; --warn-soft:#3a2d17; --bad:#ef8a80; --bad-soft:#3b211e;
-  --ok:#7fc08f; --ok-soft:#1f3326; --info:#c2a2ec; --info-soft:#2c2140; --code-bg:#1d2230; color-scheme:dark}
+  --ok:#7fc08f; --ok-soft:#1f3326; --info:#c2a2ec; --info-soft:#2c2140; --code-bg:#1d2230; --new:#ff8a80; --new-soft:#3d1f1f; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.6;margin:0}
 .wrap{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:28px 64px;display:grid;grid-template-columns:220px minmax(0,1fr);gap:40px}
@@ -123,6 +123,21 @@ button.copy:focus-visible,a:focus-visible,summary:focus-visible{outline:2px soli
 ul.rules{padding-left:20px;max-width:80ch} ul.rules li{margin:6px 0}
 .perm td.c.no{color:var(--muted);font-weight:400}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+/* v1.2: phần mới tô đỏ */
+.tag.new{background:var(--new);color:var(--bg);font-weight:700}
+details.tbl>summary span.tag{flex:none}
+tr.new td{background:var(--new-soft)}
+tr.new td:first-child code{color:var(--new);font-weight:700;background:transparent}
+tr.new td:last-child{color:var(--new)}
+.newtxt{color:var(--new)!important;font-weight:600}
+li.new{color:var(--new)}
+.legend .sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:6px;background:var(--new-soft);border:1px solid var(--new)}
+section.new-sec h2 .no{color:var(--new)}
+.state{display:inline-block;font-size:12px;font-weight:600;padding:2px 10px;border-radius:999px;white-space:nowrap}
+.st-active{background:var(--ok-soft);color:var(--ok)} .st-must{background:var(--warn-soft);color:var(--warn)}
+.st-none{background:var(--sunk);color:var(--muted)} .st-locked,.st-resigned{background:var(--new-soft);color:var(--new)}
+.steps.new li::before{background:var(--new)}
+.pre-new{border-color:var(--new)!important}
 </style>
 
 <div class="wrap">
@@ -131,6 +146,7 @@ ul.rules{padding-left:20px;max-width:80ch} ul.rules li{margin:6px 0}
   <ol>
     <li><a href="#tong-quan">Tổng quan &amp; quy ước</a></li>
     <li><a href="#bo-sung">Yêu cầu bổ sung v1.1</a></li>
+    <li><a href="#nhan-su" class="newtxt">Bổ sung v1.2 · Nhân sự</a></li>
     <li><a href="#quy-trinh">Quy trình nghiệp vụ</a></li>
     <li><a href="#erd">Sơ đồ quan hệ</a></li>
     <li><a href="#bang">Danh sách bảng &amp; cột</a></li>
@@ -146,14 +162,16 @@ ul.rules{padding-left:20px;max-width:80ch} ul.rules li{margin:6px 0}
 
 <main>
 <header class="hero">
-  <div class="eyebrow">database · v1.1</div>
+  <div class="eyebrow">database · v1.2</div>
   <h1>Trang Way — Hệ thống quản lý cung ứng lao động</h1>
   <p>Tài liệu mô tả database cho quy trình: <b>nhà máy đặt đơn hàng</b> (cần bao nhiêu người, vị trí nào) → chia chỉ tiêu cho recruiter và vendor → tuyển, điều phối người lao động vào vị trí → <b>chấm công GPS</b> tại nhà máy → tạm ứng, tính lương theo ngày công → thu phí doanh nghiệp, trả vendor, tính hoa hồng → chốt sổ chu kỳ. Database dựng theo bản demo <code>demohrm-tau.vercel.app</code>: đủ 11 màn hình, mỗi con số trên giao diện đều truy ra được bảng hoặc view nào. Lập trình viên hoặc AI đọc tài liệu này để viết backend.</p>
   <div class="meta">
     <span>Database: <b>PostgreSQL 14+ / Supabase</b></span>
-    <span>Số bảng: <b>34</b> + 19 view + 8 hàm + 10 trigger nghiệp vụ</span>
+    <span>Số bảng: <b>36</b> + 21 view + 18 hàm + 9 hàm trigger</span>
     <span>Ngày: <b>06/10/2026</b></span>
-    <span>Trạng thái SQL: <b>đã chạy thử trên PostgreSQL 16; 11 yêu cầu bổ sung đều có truy vấn kiểm tra</b></span>
+    <span>Trạng thái SQL: <b>đã chạy thử trên PostgreSQL 16; số liệu v1.1 giữ nguyên sau khi thêm v1.2</b></span>
+  </div>
+  <div class="legend"><span><span class="sw"></span>Nền đỏ, chữ đỏ = mới trong v1.2 (Nhân sự, phòng ban, vị trí, tài khoản)</span><span><span class="tag new">MỚI</span> cột mới trong bảng đã có</span><span><span class="tag new">BẢNG MỚI</span></span>
   </div>
 </header>
 
@@ -163,7 +181,7 @@ ul.rules{padding-left:20px;max-width:80ch} ul.rules li{margin:6px 0}
 <div class="tw"><table class="wide">
 <thead><tr><th>Nhóm</th><th>Làm gì</th><th>Bảng</th></tr></thead>
 <tbody>
-<tr><td><b>Tổ chức &amp; chu kỳ</b></td><td>Nhân viên, nhóm tuyển dụng, chu kỳ tháng/quý và hạn chốt công</td><td><code>staff</code> <code>teams</code> <code>team_members</code> <code>periods</code></td></tr>
+<tr class="new"><td><b>Tổ chức, nhân sự &amp; chu kỳ</b></td><td>Phòng ban, vị trí / chức vụ, hồ sơ nhân sự, tài khoản đăng nhập, nhóm tuyển dụng, chu kỳ tháng/quý</td><td><code>departments</code> <code>job_positions</code> <code>staff</code> <code>teams</code> <code>team_members</code> <code>periods</code></td></tr>
 <tr><td><b>Khách hàng</b></td><td>Nhà máy, tọa độ GPS, bán kính chấm công, ca làm, quản lý đón</td><td><code>companies</code> <code>work_sites</code> <code>shifts</code> <code>company_supervisors</code></td></tr>
 <tr><td><b>Đơn hàng</b></td><td>Chỉ tiêu theo nhà máy, vị trí tuyển, mô tả việc, lương theo giai đoạn, giao chỉ tiêu</td><td><code>orders</code> <code>order_positions</code> <code>position_wage_rates</code> <code>order_vendors</code> <code>quota_assignments</code> <code>weekly_checkins</code></td></tr>
 <tr><td><b>Người lao động</b></td><td>Hồ sơ định danh, CCCD, các đợt làm việc, bàn giao, phỏng vấn, cảnh báo trùng</td><td><code>workers</code> <code>worker_documents</code> <code>worker_placements</code> <code>handovers</code> <code>interviews</code> <code>worker_events</code> <code>duplicate_alerts</code></td></tr>
@@ -207,8 +225,80 @@ ul.rules{padding-left:20px;max-width:80ch} ul.rules li{margin:6px 0}
 </tbody></table></div>
 </section>
 
+<section id="nhan-su" class="new-sec">
+<h2><span class="no">3</span><span class="newtxt">Bổ sung v1.2 · Nhân sự, phòng ban, vị trí &amp; tài khoản</span></h2>
+<p>Thêm module Nhân sự theo yêu cầu: <b>phòng ban</b>, <b>vị trí / chức vụ</b>, <b>tài khoản &amp; mật khẩu</b>. Toàn bộ phần này tô đỏ trong tài liệu.</p>
+<div class="tw"><table class="wide">
+<thead><tr><th>Yêu cầu</th><th>Database</th><th>Cách hoạt động</th></tr></thead>
+<tbody>
+<tr class="new"><td><b>Phòng ban</b></td><td><code>departments</code> · view <code>v_department_headcount</code></td><td>Có phòng ban cha (làm cây), trưởng phòng. View đếm số nhân sự, thử việc, chưa có tài khoản, bị khoá theo phòng</td></tr>
+<tr class="new"><td><b>Vị trí / chức vụ</b></td><td><code>job_positions</code></td><td>Mỗi vị trí thuộc một phòng ban, có cấp bậc 1–9 và <b>quyền mặc định</b>. Chọn vị trí cho nhân sự → trigger tự điền phòng ban và quyền (vẫn chỉnh tay được)</td></tr>
+<tr class="new"><td><b>Hồ sơ nhân sự</b></td><td>thêm cột vào <code>staff</code> · view <code>v_staff_directory</code></td><td>Giới tính, ngày sinh, địa chỉ, ngày vào làm, hết thử việc, ngày nghỉ, tình trạng làm việc, quản lý trực tiếp, ảnh. Chuyển “đã nghỉ” → tự ngừng hoạt động, điền ngày nghỉ</td></tr>
+<tr class="new"><td><b>Tài khoản &amp; mật khẩu</b></td><td>thêm cột vào <code>staff</code> · Supabase Auth · Edge Function <code>staff-account</code></td><td>Tên đăng nhập, khoá tài khoản, bắt đổi mật khẩu lần đầu, lần đăng nhập cuối. <b>Không có cột mật khẩu</b>: mật khẩu (đã băm bcrypt) nằm trong <code>auth.users</code> của Supabase</td></tr>
+</tbody></table></div>
+<div class="note warn"><b>Vì sao không lưu mật khẩu trong bảng nhân sự?</b> Bảng <code>staff</code> được nhiều màn hình và nhiều vai trò đọc. Lưu mật khẩu ở đây, kể cả đã mã hoá, thì ai đọc được bảng là có thể đem đi dò. Supabase Auth đã lưu mật khẩu dạng băm và lo đăng nhập, phiên, đổi mật khẩu. Màn hình Nhân sự chỉ hiển thị <b>trạng thái</b> tài khoản, không bao giờ hiển thị mật khẩu.</div>
+
+<h3 class="newtxt">Luồng tài khoản</h3>
+<ol class="steps new">
+  <li><b>Tạo hồ sơ</b>Chọn vị trí; phòng ban + quyền tự điền<small>insert staff</small></li>
+  <li><b>Cấp tài khoản</b>Admin nhập tên đăng nhập + mật khẩu tạm<small>staff-account · create</small></li>
+  <li><b>Đăng nhập</b>Tên đăng nhập → email → Supabase<small>fn_login_email · signInWithPassword</small></li>
+  <li><b>Đổi mật khẩu lần đầu</b>Cờ bắt đổi bật thì chuyển sang màn đổi mật khẩu<small>fn_after_login · fn_mark_password_changed</small></li>
+  <li><b>Quên / lộ mật khẩu</b>Admin cấp lại mật khẩu tạm hoặc khoá<small>staff-account · reset_password / lock</small></li>
+  <li><b>Nghỉ việc</b>work_status = resigned: hết đăng nhập, giữ lịch sử<small>trigger staff_before</small></li>
+</ol>
+
+<h3 class="newtxt">Trạng thái tài khoản (cột <code>account_state</code>)</h3>
+<div class="tw"><table>
+<thead><tr><th>account_state</th><th>Hiển thị gợi ý</th><th>Khi nào</th></tr></thead>
+<tbody>
+<tr><td><code>active</code></td><td><span class="state st-active">Đang hoạt động</span></td><td>Có tài khoản, đã đổi mật khẩu, không bị khoá</td></tr>
+<tr><td><code>must_change</code></td><td><span class="state st-must">Chờ đổi mật khẩu</span></td><td>Vừa cấp hoặc vừa cấp lại mật khẩu tạm</td></tr>
+<tr><td><code>no_account</code></td><td><span class="state st-none">Chưa có tài khoản</span></td><td>Có hồ sơ, chưa cấp đăng nhập</td></tr>
+<tr><td><code>locked</code></td><td><span class="state st-locked">Bị khoá</span></td><td>Admin khoá, kèm lý do</td></tr>
+<tr><td><code>resigned</code></td><td><span class="state st-resigned">Đã nghỉ việc</span></td><td><code>work_status = resigned</code></td></tr>
+</tbody></table></div>
+
+<h3 class="newtxt">Dữ liệu mẫu phòng ban &amp; vị trí</h3>
+<div class="tw"><table class="wide">
+<thead><tr><th>Phòng ban</th><th>Vị trí (cấp · quyền mặc định)</th><th>Nhân sự mẫu</th></tr></thead>
+<tbody>
+<tr class="new"><td>PB-BGD · Ban Giám đốc</td><td>Giám đốc (1 · director) · Phó Giám đốc (2 · deputy_director)</td><td>NV-005 Giám đốc (mẫu), trưởng phòng</td></tr>
+<tr class="new"><td>PB-TD · Phòng Tuyển dụng</td><td>Trưởng nhóm tuyển dụng (3 · team_lead) · Chuyên viên tuyển dụng (5 · recruiter)</td><td>Trần Thu Hà (trưởng phòng), Nguyễn Tiến Đạt, Vũ Văn Cường, Đỗ Minh Thắng (thử việc)</td></tr>
+<tr class="new"><td>PB-DP · Phòng Điều phối</td><td>Điều phối viên (5 · coordinator)</td><td>NV-007 Điều phối (mẫu)</td></tr>
+<tr class="new"><td>PB-KT · Phòng Kế toán</td><td>Kế toán trưởng (3 · accountant) · Kế toán viên (5 · accountant)</td><td>NV-006 Kế toán (mẫu), trưởng phòng</td></tr>
+<tr class="new"><td>PB-HC · Phòng Hành chính - IT</td><td>Quản trị hệ thống (4 · admin)</td><td>—</td></tr>
+</tbody></table></div>
+<p class="muted">Tài khoản mẫu: Giám đốc và Trần Thu Hà đang hoạt động, Vũ Văn Cường chờ đổi mật khẩu, những người còn lại chưa có tài khoản. <code>auth_user_id</code> trong dữ liệu mẫu là giá trị giả; trên Supabase do Edge Function tạo.</p>
+
+<div class="codebox">
+<div class="bar"><span>Đăng nhập bằng tên đăng nhập (app, supabase-js)</span><button class="copy" type="button" data-target="ex-login">Sao chép</button></div>
+<pre id="ex-login" class="pre-new">const tw = supabase.schema('trangway');
+
+// 1. Tên đăng nhập → email
+const { data: email } = await tw.rpc('fn_login_email', { p_username: username });
+if (!email) throw new Error('Sai tên đăng nhập hoặc mật khẩu');     // không nói rõ sai phần nào
+
+// 2. Đăng nhập Supabase
+const { error } = await supabase.auth.signInWithPassword({ email, password });
+if (error) throw new Error('Sai tên đăng nhập hoặc mật khẩu');
+
+// 3. Hồ sơ + ghi giờ đăng nhập
+const { data: [me] } = await tw.rpc('fn_after_login');
+if (me.is_locked || me.work_status === 'resigned') { await supabase.auth.signOut(); throw new Error('Tài khoản đã bị khoá'); }
+if (me.must_change_password) router.push('/doi-mat-khau');
+
+// 4. Màn đổi mật khẩu
+await supabase.auth.updateUser({ password: newPassword });
+await tw.rpc('fn_mark_password_changed');
+
+// 5. Admin cấp tài khoản / cấp lại mật khẩu / khoá
+await supabase.functions.invoke('staff-account', { body: {
+  action: 'create', staff_code: 'NV-003', username: 'dominhthang', temp_password: 'TrangWay@2026' } });</pre></div>
+</section>
+
 <section id="quy-trinh">
-<h2><span class="no">3</span>Quy trình nghiệp vụ</h2>
+<h2><span class="no">4</span>Quy trình nghiệp vụ</h2>
 <ol class="steps">
   <li><b>Nhận đơn hàng</b>Nhà máy cần bao nhiêu người, vị trí nào, trong chu kỳ nào<small>orders · order_positions</small></li>
   <li><b>Giao chỉ tiêu</b>Chia vị trí cho recruiter, cấp hạn mức cho vendor theo nhà máy &amp; ca<small>quota_assignments · vendor_quotas</small></li>
@@ -224,7 +314,7 @@ ul.rules{padding-left:20px;max-width:80ch} ul.rules li{margin:6px 0}
 </section>
 
 <section id="erd">
-<h2><span class="no">4</span>Sơ đồ quan hệ</h2>
+<h2><span class="no">5</span>Sơ đồ quan hệ</h2>
 <p>Ba hàng là ba mảng công việc. Mỗi ô là một bảng chính (tên tiếng Việt, tên trong database, thông tin chính). Mũi tên “1 → nhiều” nghĩa là một dòng bên trái có nhiều dòng bên phải.</p>
 <figure class="dg">
 <div class="dg-scroll">
@@ -369,16 +459,18 @@ ul.rules{padding-left:20px;max-width:80ch} ul.rules li{margin:6px 0}
 </section>
 
 <section id="bang">
-<h2><span class="no">5</span>Danh sách bảng &amp; cột</h2>
+<h2><span class="no">6</span>Danh sách bảng &amp; cột</h2>
 <div class="legend">
   <span><span class="tag pk">PK</span> khóa chính</span>
   <span><span class="tag fk">FK → bảng</span> khóa ngoại</span>
   <span><span class="tag gen">DB tự tính</span> cột GENERATED, không ghi</span>
   <span><span class="tag calc">Trigger ghi</span> trigger tự cập nhật, frontend không gửi</span>
 </div>
-<h3 class='grp'>Tổ chức & chu kỳ</h3><p class='muted'>Ai làm việc, thuộc nhóm nào, đang ở chu kỳ nào.</p>
-<details class='tbl' id='t-staff' open><summary><code class='tn'>staff</code><span>Nhân viên nội bộ: recruiter, trưởng nhóm, kế toán, giám đốc. Đăng nhập và phân quyền theo <code>role</code>.</span></summary><div class='tw'><table class='cols'><thead><tr><th>Cột</th><th>Kiểu</th><th>Bắt buộc</th><th>Mặc định</th><th>Ý nghĩa</th></tr></thead><tbody><tr><td><code>id</code></td><td class='ty'>bigint</td><td class='c'>✓</td><td class='ty'></td><td><span class="tag pk">PK</span> Khóa chính, tự tăng</td></tr><tr><td><code>auth_user_id</code></td><td class='ty'>uuid</td><td class='c'></td><td class='ty'></td><td> liên kết auth.users (Supabase) nếu dùng</td></tr><tr><td><code>code</code></td><td class='ty'>text</td><td class='c'>✓</td><td class='ty'></td><td> NV-001</td></tr><tr><td><code>full_name</code></td><td class='ty'>text</td><td class='c'>✓</td><td class='ty'></td><td> Họ và tên</td></tr><tr><td><code>initials</code></td><td class='ty'>text</td><td class='c'></td><td class='ty'></td><td> TH, VC, ĐT (avatar chữ)</td></tr><tr><td><code>email</code></td><td class='ty'>text</td><td class='c'></td><td class='ty'></td><td> Email đăng nhập</td></tr><tr><td><code>phone</code></td><td class='ty'>text</td><td class='c'></td><td class='ty'></td><td> Số điện thoại</td></tr><tr><td><code>role</code></td><td class='ty'>staff_role</td><td class='c'>✓</td><td class='ty'>recruiter</td><td> Vai trò, dùng để phân quyền: director · deputy_director · admin · team_lead · recruiter · accountant · coordinator</td></tr><tr><td><code>title</code></td><td class='ty'>text</td><td class='c'></td><td class='ty'></td><td> &quot;Trưởng nhóm Tuyển dụng VP&quot;</td></tr><tr><td><code>status</code></td><td class='ty'>record_status</td><td class='c'>✓</td><td class='ty'>active</td><td> Trạng thái: active · inactive</td></tr><tr><td><code>created_at</code></td><td class='ty'>timestamptz</td><td class='c'>✓</td><td class='ty'>now()</td><td> Thời điểm tạo</td></tr><tr><td><code>updated_at</code></td><td class='ty'>timestamptz</td><td class='c'>✓</td><td class='ty'>now()</td><td> Thời điểm sửa gần nhất (trigger tự cập nhật)</td></tr></tbody></table></div></details>
-<details class='tbl' id='t-teams' open><summary><code class='tn'>teams</code><span>Nhóm tuyển dụng theo khu vực (Vĩnh Phúc, Hà Nội).</span></summary><div class='tw'><table class='cols'><thead><tr><th>Cột</th><th>Kiểu</th><th>Bắt buộc</th><th>Mặc định</th><th>Ý nghĩa</th></tr></thead><tbody><tr><td><code>id</code></td><td class='ty'>bigint</td><td class='c'>✓</td><td class='ty'></td><td><span class="tag pk">PK</span> Khóa chính, tự tăng</td></tr><tr><td><code>code</code></td><td class='ty'>text</td><td class='c'>✓</td><td class='ty'></td><td> TD-VP</td></tr><tr><td><code>name</code></td><td class='ty'>text</td><td class='c'>✓</td><td class='ty'></td><td> Tuyển dụng Vĩnh Phúc</td></tr><tr><td><code>region</code></td><td class='ty'>text</td><td class='c'></td><td class='ty'></td><td> Vĩnh Phúc / Hà Nội</td></tr><tr><td><code>leader_id</code></td><td class='ty'>bigint</td><td class='c'></td><td class='ty'></td><td><span class="tag fk">FK → staff</span> → staff.id</td></tr><tr><td><code>status</code></td><td class='ty'>record_status</td><td class='c'>✓</td><td class='ty'>active</td><td> Trạng thái: active · inactive</td></tr><tr><td><code>created_at</code></td><td class='ty'>timestamptz</td><td class='c'>✓</td><td class='ty'>now()</td><td> Thời điểm tạo</td></tr></tbody></table></div></details>
+<h3 class='grp'>Tổ chức, nhân sự & chu kỳ</h3><p class='muted'>Phòng ban, vị trí, nhân sự và tài khoản, nhóm tuyển dụng, chu kỳ.</p>
+<details class='tbl' id='t-departments' open><summary><code class='tn newtxt'>departments</code> <span class='tag new'>BẢNG MỚI</span><span>Phòng ban. Có phòng ban cha để làm cây, trưởng phòng. Ngừng dùng thì đặt <code>inactive</code>, không xoá.</span></summary><div class='tw'><table class='cols'><thead><tr><th>Cột</th><th>Kiểu</th><th>Bắt buộc</th><th>Mặc định</th><th>Ý nghĩa</th></tr></thead><tbody><tr class=new><td><code>id</code></td><td class='ty'>bigint</td><td class='c'>✓</td><td class='ty'></td><td><span class="tag pk">PK</span> Khóa chính, tự tăng</td></tr><tr class=new><td><code>code</code></td><td class='ty'>text</td><td class='c'>✓</td><td class='ty'></td><td> PB-TD</td></tr><tr class=new><td><code>name</code></td><td class='ty'>text</td><td class='c'>✓</td><td class='ty'></td><td> Phòng Tuyển dụng</td></tr><tr class=new><td><code>parent_id</code></td><td class='ty'>bigint</td><td class='c'></td><td class='ty'></td><td><span class="tag fk">FK → departments</span> phòng ban cha (để trống nếu cấp cao nhất)</td></tr><tr class=new><td><code>phone</code></td><td class='ty'>text</td><td class='c'></td><td class='ty'></td><td> Số điện thoại</td></tr><tr class=new><td><code>email</code></td><td class='ty'>text</td><td class='c'></td><td class='ty'></td><td> Email đăng nhập</td></tr><tr class=new><td><code>sort_order</code></td><td class='ty'>smallint</td><td class='c'>✓</td><td class='ty'>0</td><td> Thứ tự hiển thị</td></tr><tr class=new><td><code>note</code></td><td class='ty'>text</td><td class='c'></td><td class='ty'></td><td> Ghi chú tự do</td></tr><tr class=new><td><code>status</code></td><td class='ty'>record_status</td><td class='c'>✓</td><td class='ty'>active</td><td> Trạng thái: active · inactive</td></tr><tr class=new><td><code>created_at</code></td><td class='ty'>timestamptz</td><td class='c'>✓</td><td class='ty'>now()</td><td> Thời điểm tạo</td></tr><tr class=new><td><code>updated_at</code></td><td class='ty'>timestamptz</td><td class='c'>✓</td><td class='ty'>now()</td><td> Thời điểm sửa gần nhất (trigger tự cập nhật)</td></tr><tr class=new><td><code>manager_staff_id</code></td><td class='ty'>bigint</td><td class='c'></td><td class='ty'></td><td><span class="tag fk">FK → staff</span> → staff.id</td></tr></tbody></table></div></details>
+<details class='tbl' id='t-job_positions' open><summary><code class='tn newtxt'>job_positions</code> <span class='tag new'>BẢNG MỚI</span><span>Vị trí / chức vụ trong từng phòng ban, có cấp bậc và <b>quyền mặc định</b>. Chọn vị trí cho nhân sự thì phòng ban và quyền tự điền.</span></summary><div class='tw'><table class='cols'><thead><tr><th>Cột</th><th>Kiểu</th><th>Bắt buộc</th><th>Mặc định</th><th>Ý nghĩa</th></tr></thead><tbody><tr class=new><td><code>id</code></td><td class='ty'>bigint</td><td class='c'>✓</td><td class='ty'></td><td><span class="tag pk">PK</span> Khóa chính, tự tăng</td></tr><tr class=new><td><code>code</code></td><td class='ty'>text</td><td class='c'>✓</td><td class='ty'></td><td> VT-CVTD</td></tr><tr class=new><td><code>name</code></td><td class='ty'>text</td><td class='c'>✓</td><td class='ty'></td><td> Chuyên viên tuyển dụng</td></tr><tr class=new><td><code>department_id</code></td><td class='ty'>bigint</td><td class='c'>✓</td><td class='ty'></td><td><span class="tag fk">FK → departments</span> → departments.id</td></tr><tr class=new><td><code>level</code></td><td class='ty'>smallint</td><td class='c'>✓</td><td class='ty'>5</td><td> Cấp bậc, 1 = cao nhất</td></tr><tr class=new><td><code>default_role</code></td><td class='ty'>staff_role</td><td class='c'>✓</td><td class='ty'></td><td> Quyền tự gán khi nhân sự nhận vị trí này: director · deputy_director · admin · team_lead · recruiter · accountant · coordinator</td></tr><tr class=new><td><code>description</code></td><td class='ty'>text</td><td class='c'></td><td class='ty'></td><td> Mô tả công việc</td></tr><tr class=new><td><code>sort_order</code></td><td class='ty'>smallint</td><td class='c'>✓</td><td class='ty'>0</td><td> Thứ tự hiển thị</td></tr><tr class=new><td><code>status</code></td><td class='ty'>record_status</td><td class='c'>✓</td><td class='ty'>active</td><td> Trạng thái: active · inactive</td></tr><tr class=new><td><code>created_at</code></td><td class='ty'>timestamptz</td><td class='c'>✓</td><td class='ty'>now()</td><td> Thời điểm tạo</td></tr><tr class=new><td><code>updated_at</code></td><td class='ty'>timestamptz</td><td class='c'>✓</td><td class='ty'>now()</td><td> Thời điểm sửa gần nhất (trigger tự cập nhật)</td></tr></tbody></table></div></details>
+<details class='tbl' id='t-staff' open><summary><code class='tn'>staff</code> <span class='tag new'>THÊM CỘT</span><span>Nhân viên nội bộ kèm hồ sơ nhân sự và tài khoản đăng nhập. <b>Không có cột mật khẩu</b>: mật khẩu (đã băm) nằm trong Supabase Auth, nối qua <code>auth_user_id</code>.</span></summary><div class='tw'><table class='cols'><thead><tr><th>Cột</th><th>Kiểu</th><th>Bắt buộc</th><th>Mặc định</th><th>Ý nghĩa</th></tr></thead><tbody><tr><td><code>id</code></td><td class='ty'>bigint</td><td class='c'>✓</td><td class='ty'></td><td><span class="tag pk">PK</span> Khóa chính, tự tăng</td></tr><tr><td><code>auth_user_id</code></td><td class='ty'>uuid</td><td class='c'></td><td class='ty'></td><td> tài khoản Supabase Auth (auth.users.id); mật khẩu nằm ở đó</td></tr><tr><td><code>code</code></td><td class='ty'>text</td><td class='c'>✓</td><td class='ty'></td><td> NV-001</td></tr><tr><td><code>full_name</code></td><td class='ty'>text</td><td class='c'>✓</td><td class='ty'></td><td> Họ và tên</td></tr><tr><td><code>initials</code></td><td class='ty'>text</td><td class='c'></td><td class='ty'></td><td> TH, VC, ĐT (avatar chữ)</td></tr><tr><td><code>email</code></td><td class='ty'>text</td><td class='c'></td><td class='ty'></td><td> Email đăng nhập</td></tr><tr><td><code>phone</code></td><td class='ty'>text</td><td class='c'></td><td class='ty'></td><td> Số điện thoại</td></tr><tr><td><code>role</code></td><td class='ty'>staff_role</td><td class='c'>✓</td><td class='ty'></td><td> Quyền hệ thống; để trống thì lấy theo vị trí: director · deputy_director · admin · team_lead · recruiter · accountant · coordinator</td></tr><tr><td><code>title</code></td><td class='ty'>text</td><td class='c'></td><td class='ty'></td><td> Chức danh hiển thị tự do: &quot;Trưởng nhóm Tuyển dụng VP&quot;</td></tr><tr><td><code>status</code></td><td class='ty'>record_status</td><td class='c'>✓</td><td class='ty'>active</td><td> Trạng thái: active · inactive</td></tr><tr class=new><td><code>department_id</code></td><td class='ty'>bigint</td><td class='c'></td><td class='ty'></td><td><span class="tag new">MỚI</span><span class="tag fk">FK → departments</span><span class="tag calc">Trigger ghi</span> Phòng ban (trigger lấy theo vị trí)</td></tr><tr class=new><td><code>job_position_id</code></td><td class='ty'>bigint</td><td class='c'></td><td class='ty'></td><td><span class="tag new">MỚI</span><span class="tag fk">FK → job_positions</span> Vị trí / chức vụ</td></tr><tr class=new><td><code>manager_staff_id</code></td><td class='ty'>bigint</td><td class='c'></td><td class='ty'></td><td><span class="tag new">MỚI</span><span class="tag fk">FK → staff</span> Quản lý trực tiếp</td></tr><tr class=new><td><code>gender</code></td><td class='ty'>gender_type</td><td class='c'></td><td class='ty'></td><td><span class="tag new">MỚI</span> Giới tính: male · female · other</td></tr><tr class=new><td><code>date_of_birth</code></td><td class='ty'>date</td><td class='c'></td><td class='ty'></td><td><span class="tag new">MỚI</span> Ngày sinh</td></tr><tr class=new><td><code>address</code></td><td class='ty'>text</td><td class='c'></td><td class='ty'></td><td><span class="tag new">MỚI</span> Địa chỉ</td></tr><tr class=new><td><code>hire_date</code></td><td class='ty'>date</td><td class='c'></td><td class='ty'></td><td><span class="tag new">MỚI</span> Ngày vào làm</td></tr><tr class=new><td><code>probation_end</code></td><td class='ty'>date</td><td class='c'></td><td class='ty'></td><td><span class="tag new">MỚI</span> Ngày hết thử việc</td></tr><tr class=new><td><code>leave_date</code></td><td class='ty'>date</td><td class='c'></td><td class='ty'></td><td><span class="tag new">MỚI</span><span class="tag calc">Trigger ghi</span> Ngày nghỉ việc (trigger điền khi chuyển &quot;đã nghỉ&quot;)</td></tr><tr class=new><td><code>work_status</code></td><td class='ty'>staff_work_status</td><td class='c'>✓</td><td class='ty'>official</td><td><span class="tag new">MỚI</span> Tình trạng làm việc: probation (thử việc) · official (chính thức) · on_leave (tạm nghỉ) · resigned (đã nghỉ)</td></tr><tr class=new><td><code>avatar_path</code></td><td class='ty'>text</td><td class='c'></td><td class='ty'></td><td><span class="tag new">MỚI</span> Ảnh đại diện (storage)</td></tr><tr class=new><td><code>note</code></td><td class='ty'>text</td><td class='c'></td><td class='ty'></td><td><span class="tag new">MỚI</span> Ghi chú tự do</td></tr><tr class=new><td><code>username</code></td><td class='ty'>text</td><td class='c'></td><td class='ty'></td><td><span class="tag new">MỚI</span> Tên đăng nhập, duy nhất, a-z 0-9 . _</td></tr><tr class=new><td><code>login_email</code></td><td class='ty'>text</td><td class='c'></td><td class='ty'></td><td><span class="tag new">MỚI</span> Email đăng nhập Supabase (thật hoặc username@trangway.local)</td></tr><tr class=new><td><code>must_change_password</code></td><td class='ty'>boolean</td><td class='c'>✓</td><td class='ty'>true</td><td><span class="tag new">MỚI</span> Bắt đổi mật khẩu ở lần đăng nhập tới</td></tr><tr class=new><td><code>password_changed_at</code></td><td class='ty'>timestamptz</td><td class='c'></td><td class='ty'></td><td><span class="tag new">MỚI</span> Lần đổi mật khẩu gần nhất</td></tr><tr class=new><td><code>is_locked</code></td><td class='ty'>boolean</td><td class='c'>✓</td><td class='ty'>false</td><td><span class="tag new">MỚI</span> Tài khoản bị khoá</td></tr><tr class=new><td><code>locked_reason</code></td><td class='ty'>text</td><td class='c'></td><td class='ty'></td><td><span class="tag new">MỚI</span> Lý do khoá</td></tr><tr class=new><td><code>locked_at</code></td><td class='ty'>timestamptz</td><td class='c'></td><td class='ty'></td><td><span class="tag new">MỚI</span><span class="tag calc">Trigger ghi</span> Thời điểm khoá (trigger ghi)</td></tr><tr class=new><td><code>last_login_at</code></td><td class='ty'>timestamptz</td><td class='c'></td><td class='ty'></td><td><span class="tag new">MỚI</span> Lần đăng nhập gần nhất</td></tr><tr><td><code>created_at</code></td><td class='ty'>timestamptz</td><td class='c'>✓</td><td class='ty'>now()</td><td> Thời điểm tạo</td></tr><tr><td><code>updated_at</code></td><td class='ty'>timestamptz</td><td class='c'>✓</td><td class='ty'>now()</td><td> Thời điểm sửa gần nhất (trigger tự cập nhật)</td></tr></tbody></table></div></details>
+<details class='tbl' id='t-teams' open><summary><code class='tn'>teams</code> <span class='tag new'>THÊM CỘT</span><span>Nhóm tuyển dụng theo khu vực (Vĩnh Phúc, Hà Nội).</span></summary><div class='tw'><table class='cols'><thead><tr><th>Cột</th><th>Kiểu</th><th>Bắt buộc</th><th>Mặc định</th><th>Ý nghĩa</th></tr></thead><tbody><tr><td><code>id</code></td><td class='ty'>bigint</td><td class='c'>✓</td><td class='ty'></td><td><span class="tag pk">PK</span> Khóa chính, tự tăng</td></tr><tr><td><code>code</code></td><td class='ty'>text</td><td class='c'>✓</td><td class='ty'></td><td> TD-VP</td></tr><tr><td><code>name</code></td><td class='ty'>text</td><td class='c'>✓</td><td class='ty'></td><td> Tuyển dụng Vĩnh Phúc</td></tr><tr><td><code>region</code></td><td class='ty'>text</td><td class='c'></td><td class='ty'></td><td> Vĩnh Phúc / Hà Nội</td></tr><tr class=new><td><code>department_id</code></td><td class='ty'>bigint</td><td class='c'></td><td class='ty'></td><td><span class="tag new">MỚI</span><span class="tag fk">FK → departments</span> [N1] Nhóm thuộc phòng ban</td></tr><tr><td><code>leader_id</code></td><td class='ty'>bigint</td><td class='c'></td><td class='ty'></td><td><span class="tag fk">FK → staff</span> → staff.id</td></tr><tr><td><code>status</code></td><td class='ty'>record_status</td><td class='c'>✓</td><td class='ty'>active</td><td> Trạng thái: active · inactive</td></tr><tr><td><code>created_at</code></td><td class='ty'>timestamptz</td><td class='c'>✓</td><td class='ty'>now()</td><td> Thời điểm tạo</td></tr></tbody></table></div></details>
 <details class='tbl' id='t-team_members' open><summary><code class='tn'>team_members</code><span>Thành viên của từng nhóm.</span></summary><div class='tw'><table class='cols'><thead><tr><th>Cột</th><th>Kiểu</th><th>Bắt buộc</th><th>Mặc định</th><th>Ý nghĩa</th></tr></thead><tbody><tr><td><code>team_id</code></td><td class='ty'>bigint</td><td class='c'>✓</td><td class='ty'></td><td><span class="tag fk">FK → teams</span> → teams.id</td></tr><tr><td><code>staff_id</code></td><td class='ty'>bigint</td><td class='c'>✓</td><td class='ty'></td><td><span class="tag fk">FK → staff</span> → staff.id</td></tr><tr><td><code>joined_at</code></td><td class='ty'>date</td><td class='c'>✓</td><td class='ty'>CURRENT_DATE</td><td> Ngày vào nhóm</td></tr></tbody></table></div></details>
 <details class='tbl' id='t-periods' open><summary><code class='tn'>periods</code><span>Chu kỳ tháng và quý. Tháng trỏ về quý qua <code>parent_id</code>. Chốt sổ thì khóa chấm công, tạm ứng, lương của kỳ.</span></summary><div class='tw'><table class='cols'><thead><tr><th>Cột</th><th>Kiểu</th><th>Bắt buộc</th><th>Mặc định</th><th>Ý nghĩa</th></tr></thead><tbody><tr><td><code>id</code></td><td class='ty'>bigint</td><td class='c'>✓</td><td class='ty'></td><td><span class="tag pk">PK</span> Khóa chính, tự tăng</td></tr><tr><td><code>code</code></td><td class='ty'>text</td><td class='c'>✓</td><td class='ty'></td><td> 2026-10, 2026-Q4</td></tr><tr><td><code>name</code></td><td class='ty'>text</td><td class='c'>✓</td><td class='ty'></td><td> Tháng 10/2026</td></tr><tr><td><code>type</code></td><td class='ty'>period_type</td><td class='c'>✓</td><td class='ty'></td><td> Loại: month · quarter</td></tr><tr><td><code>parent_id</code></td><td class='ty'>bigint</td><td class='c'></td><td class='ty'></td><td><span class="tag fk">FK → periods</span> tháng thuộc quý</td></tr><tr><td><code>start_date</code></td><td class='ty'>date</td><td class='c'>✓</td><td class='ty'></td><td> Ngày bắt đầu</td></tr><tr><td><code>end_date</code></td><td class='ty'>date</td><td class='c'>✓</td><td class='ty'></td><td> Ngày kết thúc</td></tr><tr><td><code>payroll_cutoff</code></td><td class='ty'>date</td><td class='c'></td><td class='ty'></td><td> Hạn chốt công tính lương</td></tr><tr><td><code>status</code></td><td class='ty'>period_status</td><td class='c'>✓</td><td class='ty'>upcoming</td><td> Trạng thái: upcoming (sắp tới) · open (đang diễn ra) · closed (đã chốt sổ)</td></tr><tr><td><code>closed_at</code></td><td class='ty'>timestamptz</td><td class='c'></td><td class='ty'></td><td> Thời điểm chốt sổ</td></tr><tr><td><code>closed_by</code></td><td class='ty'>bigint</td><td class='c'></td><td class='ty'></td><td><span class="tag fk">FK → staff</span> → staff.id</td></tr></tbody></table></div></details>
 <h3 class='grp'>Khách hàng & địa điểm</h3><p class='muted'>Nhà máy nhận người, tọa độ chấm công, ca làm, quản lý đón.</p>
@@ -425,6 +517,16 @@ ul.rules{padding-left:20px;max-width:80ch} ul.rules li{margin:6px 0}
 <thead><tr><th>Tên</th><th>Loại</th><th>Dùng cho màn hình</th><th>Trả về</th></tr></thead>
 <tbody>
 <tr><td><code>v_order_progress</code></td><td><span class="tag view">VIEW</span></td><td>Đơn hàng cung ứng, Dashboard</td><td>Địa điểm, thời gian, phụ trách, chỉ tiêu, đã bố trí, đã đi làm, còn thiếu, phễu hồ sơ</td></tr>
+<tr class="new"><td><code>v_staff_directory</code></td><td><span class="tag view">VIEW</span></td><td>Màn hình Nhân sự</td><td>Nhân sự kèm phòng ban, vị trí, quản lý, nhóm, tên đăng nhập, <code>account_state</code>. Không có mật khẩu</td></tr>
+<tr class="new"><td><code>v_department_headcount</code></td><td><span class="tag view">VIEW</span></td><td>Cây phòng ban</td><td>Theo phòng: trưởng phòng, số nhân sự, thử việc, chưa có tài khoản, bị khoá, số vị trí</td></tr>
+<tr class="new"><td><code>fn_login_email(username)</code></td><td><span class="tag gen">HÀM</span></td><td>Màn đăng nhập</td><td>Trả email đăng nhập; tài khoản khoá / đã nghỉ trả rỗng</td></tr>
+<tr class="new"><td><code>fn_after_login()</code></td><td><span class="tag gen">HÀM</span></td><td>Sau đăng nhập</td><td>Ghi <code>last_login_at</code>; trả hồ sơ, quyền, cờ bắt đổi mật khẩu, cờ khoá</td></tr>
+<tr class="new"><td><code>fn_mark_password_changed()</code></td><td><span class="tag gen">HÀM</span></td><td>Sau khi đổi mật khẩu</td><td>Tắt cờ bắt đổi, ghi thời điểm đổi</td></tr>
+<tr class="new"><td><code>fn_link_staff_account(mã, auth id, email, username)</code></td><td><span class="tag gen">HÀM</span></td><td>Edge Function</td><td>Nối hồ sơ với tài khoản Supabase vừa tạo (chỉ GĐ / PGĐ / Admin)</td></tr>
+<tr class="new"><td><code>fn_set_staff_lock(id, khoá?, lý do)</code></td><td><span class="tag gen">HÀM</span></td><td>Admin</td><td>Khoá / mở khoá; không cho tự khoá mình</td></tr>
+<tr class="new"><td><code>is_hr_admin()</code>, <code>current_auth_uid()</code>, <code>current_auth_staff_id()</code></td><td><span class="tag gen">HÀM</span></td><td>Các hàm trên</td><td>Người đang đăng nhập (đọc từ JWT Supabase) và quyền quản trị nhân sự; tài khoản khoá / đã nghỉ không còn quyền</td></tr>
+<tr class="new"><td><code>staff_before()</code></td><td><span class="tag calc">TRIGGER</span></td><td>Lưu nhân sự</td><td>Vị trí → phòng ban + quyền; chuẩn hoá tên đăng nhập; đã nghỉ → ngừng hoạt động; ghi giờ khoá</td></tr>
+<tr class="new"><td><code>current_staff_id()</code> <span class="tag new">SỬA</span></td><td><span class="tag gen">HÀM</span></td><td>Audit log</td><td>Ngoài <code>app.current_staff_id</code>, nay nhận luôn người đăng nhập qua Supabase để ghi đúng người thao tác</td></tr>
 <tr><td><code>v_order_workers</code></td><td><span class="tag view">VIEW</span></td><td>Chi tiết đơn</td><td>NLĐ của đơn: SĐT, vị trí, ngày vào/ra, đơn giá, số công, tiền lương, người đón</td></tr>
 <tr><td><code>v_worker_assignments</code></td><td><span class="tag view">VIEW</span></td><td>Hồ sơ NLĐ › Quá trình làm việc</td><td>Mọi đợt làm việc kèm công ty, địa điểm, người tuyển, người đón, đầu mối công ty, bàn giao</td></tr>
 <tr><td><code>v_handover_board</code></td><td><span class="tag view">VIEW</span></td><td>Bàn giao</td><td>Phiếu bàn giao theo trạng thái</td></tr>
@@ -460,10 +562,10 @@ ul.rules{padding-left:20px;max-width:80ch} ul.rules li{margin:6px 0}
 </section>
 
 <section id="cong-thuc">
-<h2><span class="no">6</span>Công thức tính</h2>
+<h2><span class="no">7</span>Công thức tính</h2>
 <p>Ví dụ lấy từ dữ liệu mẫu Tháng 10/2026, giống số trên demo.</p>
 
-<h3>6.1 Tiến độ đơn hàng (ví dụ WESUM – Lắp ráp T10)</h3>
+<h3>7.1 Tiến độ đơn hàng (ví dụ WESUM – Lắp ráp T10)</h3>
 <div class="formula">
   <div class="row h"><div>Chỉ số</div><div>Công thức</div><div class="ex">Ví dụ</div></div>
   <div class="row"><div class="k">Đã đi làm của vị trí<small>working_qty</small></div><div class="eq">COUNT(worker_placements) WHERE stage = 'working'</div><div class="ex">Lắp ráp 18 · QC 6 · Kho 2</div></div>
@@ -475,7 +577,7 @@ ul.rules{padding-left:20px;max-width:80ch} ul.rules li{margin:6px 0}
 </div>
 <p class="muted">Tiến độ chu kỳ: Σ đã đi làm ÷ Σ chỉ tiêu các đơn = 58 ÷ 120 = 48,3%. Số còn cần mỗi ngày = (chỉ tiêu − đã đi làm) ÷ số ngày còn lại; ví dụ chỉ tiêu cá nhân 38, đã có 20, còn 26 ngày → 18 ÷ 26 ≈ 0,7 người/ngày.</p>
 
-<h3>6.2 Vendor &amp; SLA (ví dụ VD-DJC)</h3>
+<h3>7.2 Vendor &amp; SLA (ví dụ VD-DJC)</h3>
 <div class="formula">
   <div class="row h"><div>Chỉ số</div><div>Công thức</div><div class="ex">Ví dụ</div></div>
   <div class="row"><div class="k">Hạn mức giao<small>quota_qty</small></div><div class="eq">Σ vendor_quotas.quota_qty trong chu kỳ</div><div class="ex">WESUM 20 + SUNGJEE 15 = 35</div></div>
@@ -484,7 +586,7 @@ ul.rules{padding-left:20px;max-width:80ch} ul.rules li{margin:6px 0}
   <div class="row total"><div class="k">Tỷ lệ đạt &amp; nhóm SLA<small>fulfil_pct · sla_band</small></div><div class="eq">actual ÷ quota × 100; ≥ 85 Đạt chuẩn · 70–84 Cần cải thiện · &lt; 70 Cảnh báo</div><div class="ex">85,7% → Đạt chuẩn</div></div>
 </div>
 
-<h3>6.3 Chấm công GPS</h3>
+<h3>7.3 Chấm công GPS</h3>
 <div class="formula">
   <div class="row h"><div>Chỉ số</div><div>Công thức</div><div class="ex">Ví dụ</div></div>
   <div class="row"><div class="k">Khoảng cách tới nhà máy<small>check_in_distance_m</small></div><div class="eq">geo_distance_m(lat, lng, site.latitude, site.longitude) — Haversine, R = 6.371.000 m</div><div class="ex">21.3129, 105.6022 → 15,2 m</div></div>
@@ -493,7 +595,7 @@ ul.rules{padding-left:20px;max-width:80ch} ul.rules li{margin:6px 0}
   <div class="row total"><div class="k">Số công trong kỳ<small>work_days</small></div><div class="eq">Σ work_units WHERE status IN (valid, late, early_leave)</div><div class="ex">Trần Văn Long: 5,0 công</div></div>
 </div>
 
-<h3>6.4 Lương theo đợt &amp; tổng kỳ (ví dụ NLD-902 Phạm Văn Hùng, chuyển OJTEK → WESUM trong tháng 10)</h3>
+<h3>7.4 Lương theo đợt &amp; tổng kỳ (ví dụ NLD-902 Phạm Văn Hùng, chuyển OJTEK → WESUM trong tháng 10)</h3>
 <div class="formula">
   <div class="row h"><div>Chỉ số</div><div>Công thức</div><div class="ex">Ví dụ</div></div>
   <div class="row"><div class="k">Đơn giá áp dụng<small>position_day_rate()</small></div><div class="eq">position_wage_rates.day_rate có effective_from ≤ ngày công ≤ effective_to</div><div class="ex">OJTEK T9: 260.000 · WESUM T10: 280.000</div></div>
@@ -505,7 +607,7 @@ ul.rules{padding-left:20px;max-width:80ch} ul.rules li{margin:6px 0}
 </div>
 <p class="muted">Trần Văn Long tháng 10: lương WESUM 5 × 280.000 = 1.400.000đ; phụ cấp nhập 200.000 rồi sửa thành 250.000 (chỉ tính 250.000, bản cũ nằm trong lịch sử); bổ sung 100.000; trừ tạm ứng 500.000 → thực lĩnh 1.250.000đ. Kỳ tháng 9 của Long (SUNGJEE, 22 công × 260.000 = 5.720.000đ) đã chốt và không bị ảnh hưởng bởi mức lương tháng 10.</p>
 
-<h3>6.5 Hoa hồng &amp; lợi nhuận</h3>
+<h3>7.5 Hoa hồng &amp; lợi nhuận</h3>
 <div class="formula">
   <div class="row h"><div>Chỉ số</div><div>Công thức</div><div class="ex">Ví dụ</div></div>
   <div class="row"><div class="k">Hoa hồng dự kiến<small>commission_amount</small></div><div class="eq">work_days × commission_rates.rate_per_day (bản có hiệu lực trong kỳ)</div><div class="ex">1.320 công × 40.000 = 52.800.000đ</div></div>
@@ -515,7 +617,7 @@ ul.rules{padding-left:20px;max-width:80ch} ul.rules li{margin:6px 0}
 </section>
 
 <section id="mapping">
-<h2><span class="no">7</span>Màn hình demo → Database</h2>
+<h2><span class="no">8</span>Màn hình demo → Database</h2>
 <p>Mỗi màn hình trên demo lấy dữ liệu từ đâu.</p>
 <div class="tw"><table class="wide">
 <thead><tr><th>Màn hình</th><th>Nội dung hiển thị</th><th>Nguồn</th></tr></thead>
@@ -526,6 +628,9 @@ ul.rules{padding-left:20px;max-width:80ch} ul.rules li{margin:6px 0}
 <tr><td><b>Đơn hàng cung ứng</b></td><td>Thẻ đơn: chỉ tiêu, đã đi làm, vị trí tuyển, vendor tham gia, phễu hồ sơ, trạng thái tiến độ</td><td><code>v_order_progress</code>, <code>v_position_progress</code></td></tr>
 <tr><td><b>Cây chỉ tiêu</b></td><td>Đơn → vị trí → người/vendor nhận, %; chỉ tiêu cá nhân, việc cần xử lý</td><td><code>v_position_progress</code>, <code>quota_assignments</code>, <code>salary_advances</code> (báo ứng chờ duyệt)</td></tr>
 <tr><td><b>Hồ sơ NLĐ</b></td><td>Danh sách + lọc công ty, trạng thái, loại hình; chi tiết CCCD, ảnh, điều phối, lịch sử, chấm công, tạm ứng</td><td><code>workers</code> / <code>v_workers_public</code>, <code>worker_documents</code>, <code>worker_events</code>, <code>attendances</code>, <code>salary_advances</code></td></tr>
+<tr class="new"><td><b>Nhân sự</b> (v1.2)</td><td>Danh sách nhân sự, lọc theo phòng ban / vị trí / trạng thái; hồ sơ; cấp tài khoản, cấp lại mật khẩu, khoá</td><td><code>v_staff_directory</code>, <code>staff</code>, Edge Function <code>staff-account</code></td></tr>
+<tr class="new"><td><b>Phòng ban &amp; vị trí</b> (v1.2)</td><td>Cây phòng ban, số nhân sự; danh mục vị trí và quyền mặc định</td><td><code>v_department_headcount</code>, <code>departments</code>, <code>job_positions</code></td></tr>
+<tr class="new"><td><b>Đăng nhập / Đổi mật khẩu</b> (v1.2)</td><td>Đăng nhập bằng tên đăng nhập, bắt đổi mật khẩu lần đầu</td><td><code>fn_login_email</code>, <code>fn_after_login</code>, <code>fn_mark_password_changed</code></td></tr>
 <tr><td><b>Hồ sơ NLĐ › Quá trình làm việc</b> (mới)</td><td>Tất cả đợt: công ty, đơn, vị trí, ngày vào/ra, người tuyển, người đón &amp; SĐT, đầu mối công ty, bàn giao</td><td><code>v_worker_assignments</code></td></tr>
 <tr><td><b>Chi tiết đơn hàng</b> (mới)</td><td>Thông tin đơn, số theo trạng thái, vị trí (mô tả, ca, lương), danh sách NLĐ kèm lương &amp; người đón</td><td><code>v_order_progress</code>, <code>v_position_progress</code>, <code>v_order_workers</code></td></tr>
 <tr><td><b>Bàn giao</b> (mới)</td><td>Chờ bàn giao, đã bàn giao, đã tiếp nhận; quản lý xác nhận</td><td><code>v_handover_board</code>, <code>handovers</code></td></tr>
@@ -544,11 +649,14 @@ ul.rules{padding-left:20px;max-width:80ch} ul.rules li{margin:6px 0}
 </section>
 
 <section id="quyen">
-<h2><span class="no">8</span>Phân quyền &amp; bảo mật CCCD</h2>
+<h2><span class="no">9</span>Phân quyền &amp; bảo mật CCCD</h2>
 <p>Đề xuất theo demo (“Chỉ Giám đốc &amp; Phó Giám đốc” xem hoa hồng; ảnh CCCD làm mờ với vai trò bị giới hạn). Thực hiện bằng RLS của Supabase hoặc middleware backend. Quản lý đón phía nhà máy chỉ thấy phiếu bàn giao và danh sách NLĐ được giao cho mình (họ tên, SĐT, vị trí, ngày vào), không thấy CCCD hay lương.</p>
 <div class="tw"><table class="wide perm">
 <thead><tr><th>Dữ liệu</th><th>Giám đốc / PGĐ</th><th>Admin</th><th>Trưởng nhóm</th><th>Recruiter</th><th>Kế toán</th></tr></thead>
 <tbody>
+<tr class="new"><td>Thêm / sửa phòng ban, vị trí, hồ sơ nhân sự</td><td class="c">✓</td><td class="c">✓</td><td class="c no">—</td><td class="c no">—</td><td class="c no">—</td></tr>
+<tr class="new"><td>Cấp tài khoản, cấp lại mật khẩu, khoá</td><td class="c">✓</td><td class="c">✓</td><td class="c no">—</td><td class="c no">—</td><td class="c no">—</td></tr>
+<tr class="new"><td>Tự đổi mật khẩu của mình</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td></tr>
 <tr><td>Hồ sơ NLĐ (CCCD đã che)</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">NLĐ của mình</td><td class="c">✓</td></tr>
 <tr><td>Số CCCD đầy đủ, ảnh CCCD gốc</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c no">—</td><td class="c no">—</td></tr>
 <tr><td>Đơn hàng, chỉ tiêu</td><td class="c">✓</td><td class="c">✓</td><td class="c">Nhóm mình</td><td class="c">Được giao</td><td class="c">Xem</td></tr>
@@ -568,7 +676,7 @@ ul.rules{padding-left:20px;max-width:80ch} ul.rules li{margin:6px 0}
 </section>
 
 <section id="quy-tac">
-<h2><span class="no">9</span>Quy tắc nghiệp vụ</h2>
+<h2><span class="no">10</span>Quy tắc nghiệp vụ</h2>
 <ul class="rules">
   <li><b>Một vị trí giao cho đúng một bên</b>: <code>assignee_staff_id</code> hoặc <code>assignee_vendor_id</code>, không cả hai.</li>
   <li><b>Trạng thái NLĐ đi theo điều phối</b>: chuyển <code>worker_placements.stage</code> sang <code>working</code> thì trigger đặt <code>workers.status = working</code>, công ty và vị trí hiện tại. Nghỉ việc, tạm nghỉ do người dùng sửa trực tiếp trên hồ sơ.</li>
@@ -579,6 +687,8 @@ ul.rules{padding-left:20px;max-width:80ch} ul.rules li{margin:6px 0}
   <li><b>Chốt sổ chu kỳ</b>: sau <code>payroll_cutoff</code> (ngày 05 tháng sau) kế toán gọi <code>fn_close_period</code>. Kỳ đã chốt bị trigger chặn mọi thêm/sửa chấm công, tạm ứng, dòng lương.</li>
   <li><b>Hạn mức vendor</b>: một dòng cho mỗi vendor × nhà máy × ca × chu kỳ; “Cấp thêm” là cộng vào <code>quota_qty</code>.</li>
   <li><b>Biên bản đối soát</b> do vendor lập lúc giao ca; chỉ trưởng nhóm ký chốt (<code>signed</code>). Biên bản đã ký không sửa.</li>
+  <li class="new"><b>Nhân sự (v1.2)</b>: chọn vị trí là đủ, phòng ban và quyền tự điền. Muốn quyền khác vị trí thì sửa <code>role</code> trong cùng lần lưu. Không chọn vị trí thì bắt buộc chọn quyền.</li>
+  <li class="new"><b>Tài khoản (v1.2)</b>: tên đăng nhập 3–32 ký tự a-z, 0-9, dấu chấm, gạch dưới, không trùng (không phân biệt hoa thường). Mật khẩu tạm tối thiểu 8 ký tự có chữ và số. Khoá hoặc nghỉ việc thì đăng nhập bằng tên bị chặn và Edge Function khoá luôn phía Supabase Auth.</li>
   <li><b>Một người một hồ sơ</b>: đi làm lại hay chuyển công ty thì thêm đợt mới vào hồ sơ cũ, không tạo hồ sơ mới. Cảnh báo trùng chỉ để người phụ trách kiểm tra; database không tự xoá hay gộp.</li>
   <li><b>Kết thúc đợt</b>: điền <code>end_date</code> và <code>end_reason</code>. Trigger tự chuyển đợt sang <code>left</code>; nếu không còn đợt nào mở thì hồ sơ chuyển Nghỉ việc.</li>
   <li><b>Bàn giao</b>: tạo phiếu khi NLĐ chuyển sang Chờ đi làm. Điều phối bấm Đã bàn giao lúc đưa tới cổng; quản lý đón bấm Đã tiếp nhận (qua app hoặc link). Quản lý có thể từ chối kèm lý do.</li>
@@ -589,7 +699,7 @@ ul.rules{padding-left:20px;max-width:80ch} ul.rules li{margin:6px 0}
 </section>
 
 <section id="api">
-<h2><span class="no">10</span>API backend</h2>
+<h2><span class="no">11</span>API backend</h2>
 <div class="tw"><table class="wide api">
 <thead><tr><th>Endpoint</th><th>Làm gì</th><th>Bảng / view</th></tr></thead>
 <tbody>
@@ -603,6 +713,10 @@ ul.rules{padding-left:20px;max-width:80ch} ul.rules li{margin:6px 0}
 <tr><td><span class="m get">GET</span><code>/api/v1/workers/:id/documents/:docId/url</code></td><td>Lấy signed URL 5 phút (ghi audit)</td><td><code>audit_logs</code></td></tr>
 <tr><td><span class="m post">POST</span><code>/api/v1/placements</code></td><td>Đưa NLĐ vào vị trí tuyển</td><td><code>worker_placements</code></td></tr>
 <tr><td><span class="m patch">PATCH</span><code>/api/v1/placements/:id/stage</code></td><td>Chuyển bước phễu (hẹn PV, chờ nhận việc, đi làm)</td><td><code>worker_placements</code>, <code>worker_events</code></td></tr>
+<tr class="new"><td><span class="m get">GET</span><code>/api/v1/staff</code> · <span class="m post">POST</span> · <span class="m patch">PATCH</span><code>/:id</code></td><td>Danh sách / thêm / sửa nhân sự</td><td><code>v_staff_directory</code>, <code>staff</code></td></tr>
+<tr class="new"><td><span class="m get">GET</span><code>/api/v1/departments</code> · <code>/job-positions</code> (+ POST / PATCH)</td><td>Phòng ban, vị trí</td><td><code>v_department_headcount</code>, <code>job_positions</code></td></tr>
+<tr class="new"><td><span class="m post">POST</span> Edge Function <code>staff-account</code></td><td><code>create</code> · <code>reset_password</code> · <code>lock</code> · <code>unlock</code></td><td>Supabase Auth + <code>fn_link_staff_account</code>, <code>fn_set_staff_lock</code></td></tr>
+<tr class="new"><td>RPC <code>fn_login_email</code> · <code>fn_after_login</code> · <code>fn_mark_password_changed</code></td><td>Đăng nhập, đổi mật khẩu</td><td>—</td></tr>
 <tr><td><span class="m get">GET</span><code>/api/v1/orders/:id</code> · <code>/:id/workers</code></td><td>Chi tiết đơn và danh sách NLĐ của đơn</td><td><code>v_order_progress</code>, <code>v_order_workers</code></td></tr>
 <tr><td><span class="m post">POST</span><code>/api/v1/positions/:id/wage-rates</code></td><td>Thêm mức lương mới cho vị trí (đóng mức cũ)</td><td><code>position_wage_rates</code></td></tr>
 <tr><td><span class="m get">GET</span><code>/api/v1/workers/:id/assignments</code></td><td>Các đợt làm việc của NLĐ</td><td><code>v_worker_assignments</code></td></tr>
@@ -676,7 +790,7 @@ ul.rules{padding-left:20px;max-width:80ch} ul.rules li{margin:6px 0}
 </section>
 
 <section id="ai">
-<h2><span class="no">11</span>Hướng dẫn cho AI</h2>
+<h2><span class="no">12</span>Hướng dẫn cho AI</h2>
 <p>Dán đoạn sau cùng file SQL vào công cụ AI (Claude Code, Cursor…) để sinh backend.</p>
 <div class="codebox">
 <div class="bar"><span>Prompt</span><button class="copy" type="button" data-target="ai-prompt">Sao chép</button></div>
@@ -705,13 +819,15 @@ Yêu cầu:
 12. Lương: lương theo công lấy từ fn_generate_wage_entries(); dòng nhập tay ghi vào salary_entries,
     sửa bằng UPDATE (trigger tự lưu lịch sử), huỷ bằng voided_at. Không DELETE dòng lương.
 13. Bàn giao: quản lý nhà máy xác nhận qua link có token hoặc tài khoản company_supervisors.auth_user_id.
-14. Viết test cho: check-in ngoài bán kính, đi muộn, chấm công ngoài ngày vào/ra, hai đợt chồng thời gian,
+14. Nhân sự (v1.2): KHÔNG thêm cột mật khẩu vào staff. Đăng nhập qua Supabase Auth (fn_login_email → signInWithPassword
+    → fn_after_login). Tạo / cấp lại mật khẩu / khoá tài khoản chỉ qua Edge Function staff-account.
+15. Viết test cho: check-in ngoài bán kính, đi muộn, chấm công ngoài ngày vào/ra, hai đợt chồng thời gian,
     đổi đơn giá giữa kỳ, sửa dòng lương không cộng trùng, tạm ứng vượt lương, chốt sổ chu kỳ.</pre></div>
 </section>
 
 <section id="sql">
 <h2><span class="no">13</span>SQL đầy đủ</h2>
-<p>Chạy theo thứ tự <code>01_schema.sql</code> → <code>02_seed.sql</code>. File <code>03_queries.sql</code> là truy vấn mẫu cho từng màn hình.</p>
+<p>Chạy theo thứ tự <code>01_schema.sql</code> → <code>02_seed.sql</code>. Deploy Edge Function: <code>supabase functions deploy staff-account</code>. File <code>03_queries.sql</code> là truy vấn mẫu cho từng màn hình.</p>
 <div class="codebox">
 <div class="bar"><span>01_schema.sql — bảng, enum, trigger, view</span><button class="copy" type="button" data-target="sql-schema">Sao chép</button></div>
 <pre id="sql-schema">-- =====================================================================
@@ -731,6 +847,13 @@ Yêu cầu:
 --   [B9] Cảnh báo trùng hồ sơ ............. fn_find_worker_duplicates(), duplicate_alerts
 --   [B10] Nhập lương nhiều lần ............ salary_entries, salary_entry_history
 --   [B11] Lương theo từng đợt / công ty ... v_placement_pay, fn_generate_wage_entries()
+--  v1.2 bổ sung:
+--   [N1] Phòng ban ........................ departments, v_department_headcount
+--   [N2] Vị trí / chức vụ ................. job_positions (quyền mặc định theo vị trí)
+--   [N3] Hồ sơ nhân sự .................... staff (+ phòng ban, vị trí, ngày vào làm, thử việc, nghỉ việc…)
+--   [N4] Tài khoản đăng nhập .............. staff (username, khoá, bắt đổi mật khẩu), fn_login_email(),
+--                                           fn_after_login(), fn_link_staff_account(), fn_set_staff_lock()
+--        Mật khẩu KHÔNG lưu ở bảng nào của trangway: Supabase Auth (auth.users) giữ mật khẩu đã băm.
 -- =====================================================================
 
 CREATE EXTENSION IF NOT EXISTS btree_gist;   -- cho ràng buộc chống chồng thời gian (EXCLUDE)
@@ -762,6 +885,8 @@ CREATE TYPE payroll_status    AS ENUM (&#x27;draft&#x27;,&#x27;confirmed&#x27;,&
 CREATE TYPE txn_type          AS ENUM (&#x27;income&#x27;,&#x27;expense&#x27;);
 CREATE TYPE txn_status        AS ENUM (&#x27;pending&#x27;,&#x27;approved&#x27;,&#x27;completed&#x27;,&#x27;cancelled&#x27;);
 CREATE TYPE audit_action      AS ENUM (&#x27;INSERT&#x27;,&#x27;UPDATE&#x27;,&#x27;DELETE&#x27;,&#x27;VIEW_SENSITIVE&#x27;,&#x27;EXPORT&#x27;,&#x27;LOGIN&#x27;,&#x27;APPROVE&#x27;);
+-- v1.2
+CREATE TYPE staff_work_status AS ENUM (&#x27;probation&#x27;,&#x27;official&#x27;,&#x27;on_leave&#x27;,&#x27;resigned&#x27;); -- Thử việc / Chính thức / Tạm nghỉ / Đã nghỉ
 -- v1.1
 CREATE TYPE handover_status   AS ENUM (&#x27;pending&#x27;,&#x27;handed_over&#x27;,&#x27;received&#x27;,&#x27;refused&#x27;);   -- Chờ bàn giao / Đã bàn giao / Đã tiếp nhận / Từ chối nhận
 CREATE TYPE wage_unit         AS ENUM (&#x27;day&#x27;,&#x27;shift&#x27;,&#x27;hour&#x27;,&#x27;month&#x27;,&#x27;product&#x27;);         -- Đơn vị tính lương
@@ -781,28 +906,92 @@ CREATE OR REPLACE FUNCTION normalize_phone(p text) RETURNS text LANGUAGE sql IMM
 $$;
 
 -- ---------------------------------------------------------------------
--- 1. NHÂN SỰ NỘI BỘ &amp; NHÓM
+-- 1. NHÂN SỰ NỘI BỘ: PHÒNG BAN, VỊ TRÍ, NHÂN SỰ, TÀI KHOẢN, NHÓM
 -- ---------------------------------------------------------------------
+-- [N1] Phòng ban (manager_staff_id được thêm sau khi có bảng staff)
+CREATE TABLE departments (
+  id            bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  code          text UNIQUE NOT NULL,              -- PB-TD
+  name          text NOT NULL,                     -- Phòng Tuyển dụng
+  parent_id     bigint REFERENCES departments(id), -- phòng ban cha (để trống nếu cấp cao nhất)
+  phone         text,
+  email         text,
+  sort_order    smallint NOT NULL DEFAULT 0,
+  note          text,
+  status        record_status NOT NULL DEFAULT &#x27;active&#x27;,
+  created_at    timestamptz NOT NULL DEFAULT now(),
+  updated_at    timestamptz NOT NULL DEFAULT now(),
+  CHECK (parent_id IS NULL OR parent_id &lt;&gt; id)
+);
+
+-- [N2] Vị trí / chức vụ: thuộc một phòng ban, có quyền hệ thống mặc định
+CREATE TABLE job_positions (
+  id            bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  code          text UNIQUE NOT NULL,              -- VT-CVTD
+  name          text NOT NULL,                     -- Chuyên viên tuyển dụng
+  department_id bigint NOT NULL REFERENCES departments(id),
+  level         smallint NOT NULL DEFAULT 5 CHECK (level BETWEEN 1 AND 9), -- Cấp bậc, 1 = cao nhất
+  default_role  staff_role NOT NULL,               -- Quyền tự gán khi nhân sự nhận vị trí này
+  description   text,                              -- Mô tả công việc
+  sort_order    smallint NOT NULL DEFAULT 0,
+  status        record_status NOT NULL DEFAULT &#x27;active&#x27;,
+  created_at    timestamptz NOT NULL DEFAULT now(),
+  updated_at    timestamptz NOT NULL DEFAULT now()
+);
+
+-- [N3][N4] Nhân sự nội bộ + tài khoản đăng nhập
 CREATE TABLE staff (
   id            bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  auth_user_id  uuid UNIQUE,                       -- liên kết auth.users (Supabase) nếu dùng
+  auth_user_id  uuid UNIQUE,                       -- tài khoản Supabase Auth (auth.users.id); mật khẩu nằm ở đó
   code          text UNIQUE NOT NULL,              -- NV-001
   full_name     text NOT NULL,
   initials      text,                              -- TH, VC, ĐT (avatar chữ)
   email         text UNIQUE,
   phone         text,
-  role          staff_role NOT NULL DEFAULT &#x27;recruiter&#x27;,
-  title         text,                              -- &quot;Trưởng nhóm Tuyển dụng VP&quot;
+  role          staff_role NOT NULL,               -- Quyền hệ thống; để trống thì lấy theo vị trí
+  title         text,                              -- Chức danh hiển thị tự do: &quot;Trưởng nhóm Tuyển dụng VP&quot;
   status        record_status NOT NULL DEFAULT &#x27;active&#x27;,
+  -- [N3] Hồ sơ nhân sự
+  department_id    bigint REFERENCES departments(id),   -- Phòng ban (trigger lấy theo vị trí)
+  job_position_id  bigint REFERENCES job_positions(id), -- Vị trí / chức vụ
+  manager_staff_id bigint REFERENCES staff(id),         -- Quản lý trực tiếp
+  gender           gender_type,
+  date_of_birth    date,
+  address          text,
+  hire_date        date,                           -- Ngày vào làm
+  probation_end    date,                           -- Ngày hết thử việc
+  leave_date       date,                           -- Ngày nghỉ việc (trigger điền khi chuyển &quot;đã nghỉ&quot;)
+  work_status      staff_work_status NOT NULL DEFAULT &#x27;official&#x27;, -- Tình trạng làm việc
+  avatar_path      text,                           -- Ảnh đại diện (storage)
+  note             text,
+  -- [N4] Tài khoản đăng nhập (không có cột mật khẩu)
+  username         text,                           -- Tên đăng nhập, duy nhất, a-z 0-9 . _
+  login_email      text,                           -- Email đăng nhập Supabase (thật hoặc username@trangway.local)
+  must_change_password boolean NOT NULL DEFAULT true, -- Bắt đổi mật khẩu ở lần đăng nhập tới
+  password_changed_at  timestamptz,                -- Lần đổi mật khẩu gần nhất
+  is_locked        boolean NOT NULL DEFAULT false, -- Tài khoản bị khoá
+  locked_reason    text,                           -- Lý do khoá
+  locked_at        timestamptz,                    -- Thời điểm khoá (trigger ghi)
+  last_login_at    timestamptz,                    -- Lần đăng nhập gần nhất
   created_at    timestamptz NOT NULL DEFAULT now(),
-  updated_at    timestamptz NOT NULL DEFAULT now()
+  updated_at    timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT staff_username_format CHECK (username IS NULL OR username ~ &#x27;^[a-z0-9._]{3,32}$&#x27;),
+  CONSTRAINT staff_dates_check CHECK ((leave_date IS NULL OR hire_date IS NULL OR leave_date &gt;= hire_date)
+                                  AND (probation_end IS NULL OR hire_date IS NULL OR probation_end &gt;= hire_date)),
+  CONSTRAINT staff_not_own_manager CHECK (manager_staff_id IS NULL OR manager_staff_id &lt;&gt; id)
 );
+CREATE UNIQUE INDEX staff_username_uq    ON staff (lower(username))    WHERE username IS NOT NULL;
+CREATE UNIQUE INDEX staff_login_email_uq ON staff (lower(login_email)) WHERE login_email IS NOT NULL;
+
+-- Trưởng phòng
+ALTER TABLE departments ADD COLUMN manager_staff_id bigint REFERENCES staff(id);
 
 CREATE TABLE teams (
   id          bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   code        text UNIQUE NOT NULL,                -- TD-VP
   name        text NOT NULL,                       -- Tuyển dụng Vĩnh Phúc
   region      text,                                -- Vĩnh Phúc / Hà Nội
+  department_id bigint REFERENCES departments(id), -- [N1] Nhóm thuộc phòng ban
   leader_id   bigint REFERENCES staff(id),
   status      record_status NOT NULL DEFAULT &#x27;active&#x27;,
   created_at  timestamptz NOT NULL DEFAULT now()
@@ -1430,8 +1619,14 @@ CREATE TABLE audit_logs (
 );
 
 -- App đặt người thao tác bằng: SET LOCAL app.current_staff_id = &#x27;1&#x27;;
-CREATE OR REPLACE FUNCTION current_staff_id() RETURNS bigint LANGUAGE sql STABLE AS $$
-  SELECT nullif(current_setting(&#x27;app.current_staff_id&#x27;, true), &#x27;&#x27;)::bigint
+-- Ưu tiên app.current_staff_id (backend tự đặt); nếu gọi thẳng qua Supabase thì lấy theo tài khoản đăng nhập
+CREATE OR REPLACE FUNCTION current_staff_id() RETURNS bigint LANGUAGE sql STABLE SECURITY DEFINER
+SET search_path = trangway, public AS $$
+  SELECT coalesce(
+    nullif(current_setting(&#x27;app.current_staff_id&#x27;, true), &#x27;&#x27;)::bigint,
+    (SELECT id FROM staff WHERE auth_user_id =
+       nullif(coalesce(nullif(current_setting(&#x27;request.jwt.claim.sub&#x27;, true), &#x27;&#x27;),
+                       nullif(current_setting(&#x27;request.jwt.claims&#x27;, true), &#x27;&#x27;)::jsonb -&gt;&gt; &#x27;sub&#x27;), &#x27;&#x27;)::uuid))
 $$;
 
 CREATE OR REPLACE FUNCTION audit_trigger() RETURNS trigger LANGUAGE plpgsql AS $$
@@ -1554,9 +1749,44 @@ BEGIN
   RETURN NEW;
 END $$;
 
+-- [N2][N3][N4] Nhân sự: chọn vị trí → tự lấy phòng ban + quyền; chuẩn hoá tên đăng nhập;
+--               nghỉ việc → ngừng hoạt động; ghi thời điểm khoá
+CREATE OR REPLACE FUNCTION staff_before() RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE jp record;
+BEGIN
+  IF NEW.job_position_id IS NOT NULL AND
+     (TG_OP = &#x27;INSERT&#x27; OR NEW.job_position_id IS DISTINCT FROM OLD.job_position_id) THEN
+    SELECT department_id, default_role INTO jp FROM job_positions WHERE id = NEW.job_position_id;
+    NEW.department_id := jp.department_id;
+    -- Giữ quyền người dùng tự chọn trong cùng lần lưu; không chọn thì lấy theo vị trí
+    IF (TG_OP = &#x27;INSERT&#x27; AND NEW.role IS NULL)
+       OR (TG_OP = &#x27;UPDATE&#x27; AND NEW.role IS NOT DISTINCT FROM OLD.role) THEN
+      NEW.role := jp.default_role;
+    END IF;
+  END IF;
+  NEW.username    := lower(nullif(trim(NEW.username), &#x27;&#x27;));
+  NEW.login_email := lower(nullif(trim(NEW.login_email), &#x27;&#x27;));
+  IF NEW.work_status = &#x27;resigned&#x27; THEN
+    NEW.status := &#x27;inactive&#x27;;
+    NEW.leave_date := coalesce(NEW.leave_date, current_date);
+  ELSIF TG_OP = &#x27;UPDATE&#x27; AND OLD.work_status = &#x27;resigned&#x27; THEN
+    NEW.status := &#x27;active&#x27;;
+    NEW.leave_date := NULL;
+  END IF;
+  IF NEW.is_locked AND (TG_OP = &#x27;INSERT&#x27; OR NOT OLD.is_locked) THEN
+    NEW.locked_at := now();
+  ELSIF NOT NEW.is_locked THEN
+    NEW.locked_at := NULL; NEW.locked_reason := NULL;
+  END IF;
+  RETURN NEW;
+END $$;
+
 -- ---------------------------------------------------------------------
 -- GẮN TRIGGER
 -- ---------------------------------------------------------------------
+CREATE TRIGGER trg_staff_before  BEFORE INSERT OR UPDATE ON staff FOR EACH ROW EXECUTE FUNCTION staff_before();
+CREATE TRIGGER trg_dept_upd      BEFORE UPDATE ON departments   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE TRIGGER trg_jobpos_upd    BEFORE UPDATE ON job_positions FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 CREATE TRIGGER trg_staff_upd     BEFORE UPDATE ON staff     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 CREATE TRIGGER trg_companies_upd BEFORE UPDATE ON companies FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 CREATE TRIGGER trg_superv_upd    BEFORE UPDATE ON company_supervisors FOR EACH ROW EXECUTE FUNCTION set_updated_at();
@@ -1585,10 +1815,15 @@ CREATE TRIGGER trg_audit_payroll   AFTER INSERT OR UPDATE OR DELETE ON payrolls 
 CREATE TRIGGER trg_audit_salary    AFTER INSERT OR UPDATE OR DELETE ON salary_entries       FOR EACH ROW EXECUTE FUNCTION audit_trigger();
 CREATE TRIGGER trg_audit_handover  AFTER INSERT OR UPDATE OR DELETE ON handovers            FOR EACH ROW EXECUTE FUNCTION audit_trigger();
 CREATE TRIGGER trg_audit_rates     AFTER INSERT OR UPDATE OR DELETE ON position_wage_rates  FOR EACH ROW EXECUTE FUNCTION audit_trigger();
+CREATE TRIGGER trg_audit_dept      AFTER INSERT OR UPDATE OR DELETE ON departments          FOR EACH ROW EXECUTE FUNCTION audit_trigger();
+CREATE TRIGGER trg_audit_jobpos    AFTER INSERT OR UPDATE OR DELETE ON job_positions        FOR EACH ROW EXECUTE FUNCTION audit_trigger();
 
 -- ---------------------------------------------------------------------
 -- INDEX
 -- ---------------------------------------------------------------------
+CREATE INDEX ON job_positions (department_id);
+CREATE INDEX ON staff (department_id);
+CREATE INDEX ON staff (job_position_id);
 CREATE INDEX ON orders (period_id, company_id);
 CREATE INDEX ON order_positions (order_id);
 CREATE INDEX ON workers (status, current_company_id);
@@ -2069,6 +2304,122 @@ BEGIN
   UPDATE periods SET status = &#x27;closed&#x27;, closed_at = now(), closed_by = p_staff_id WHERE id = v_id;
   RETURN n;
 END $$;
+
+-- =====================================================================
+-- v1.2 · NHÂN SỰ &amp; TÀI KHOẢN
+-- =====================================================================
+
+-- [N3][N4] Danh bạ nhân sự cho màn hình Nhân sự. Không có mật khẩu.
+--          account_state để app tô màu (locked / resigned hiện đỏ).
+CREATE VIEW v_staff_directory AS
+SELECT s.id, s.code, s.full_name, s.initials, s.gender, s.date_of_birth, s.phone, s.email,
+       s.department_id, d.code AS department_code, d.name AS department_name,
+       s.job_position_id, jp.code AS position_code, jp.name AS position_name, jp.level AS position_level,
+       s.title, s.role, s.manager_staff_id, m.full_name AS manager_name,
+       (SELECT string_agg(t.name, &#x27;, &#x27; ORDER BY t.name) FROM team_members tm JOIN teams t ON t.id = tm.team_id
+         WHERE tm.staff_id = s.id) AS teams,
+       s.hire_date, s.probation_end, s.leave_date, s.work_status,
+       s.username, s.login_email, (s.auth_user_id IS NOT NULL) AS has_account,
+       s.must_change_password, s.password_changed_at, s.is_locked, s.locked_reason, s.last_login_at,
+       CASE WHEN s.work_status = &#x27;resigned&#x27; THEN &#x27;resigned&#x27;      -- Đã nghỉ việc
+            WHEN s.is_locked                THEN &#x27;locked&#x27;        -- Bị khoá
+            WHEN s.auth_user_id IS NULL     THEN &#x27;no_account&#x27;    -- Chưa có tài khoản
+            WHEN s.must_change_password     THEN &#x27;must_change&#x27;   -- Chờ đổi mật khẩu
+            ELSE &#x27;active&#x27; END AS account_state,                  -- Đang hoạt động
+       s.status, s.created_at
+FROM staff s
+LEFT JOIN departments d    ON d.id = s.department_id
+LEFT JOIN job_positions jp ON jp.id = s.job_position_id
+LEFT JOIN staff m          ON m.id = s.manager_staff_id;
+
+-- [N1] Số nhân sự theo phòng ban
+CREATE VIEW v_department_headcount AS
+SELECT d.id AS department_id, d.code, d.name, d.parent_id, mg.full_name AS manager_name, d.status,
+       count(s.id) FILTER (WHERE s.work_status &lt;&gt; &#x27;resigned&#x27;) AS headcount,
+       count(s.id) FILTER (WHERE s.work_status = &#x27;probation&#x27;) AS probation,
+       count(s.id) FILTER (WHERE s.auth_user_id IS NULL AND s.work_status &lt;&gt; &#x27;resigned&#x27;) AS no_account,
+       count(s.id) FILTER (WHERE s.is_locked) AS locked,
+       (SELECT count(*) FROM job_positions jp WHERE jp.department_id = d.id AND jp.status = &#x27;active&#x27;) AS position_count
+FROM departments d
+LEFT JOIN staff s  ON s.department_id = d.id
+LEFT JOIN staff mg ON mg.id = d.manager_staff_id
+GROUP BY d.id, mg.full_name;
+
+-- [N4] Người đang đăng nhập (Supabase Auth đặt JWT vào request.jwt.claims; Postgres thường thì trả NULL)
+CREATE OR REPLACE FUNCTION current_auth_uid() RETURNS uuid LANGUAGE sql STABLE AS $$
+  SELECT nullif(coalesce(nullif(current_setting(&#x27;request.jwt.claim.sub&#x27;, true), &#x27;&#x27;),
+                         nullif(current_setting(&#x27;request.jwt.claims&#x27;, true), &#x27;&#x27;)::jsonb -&gt;&gt; &#x27;sub&#x27;), &#x27;&#x27;)::uuid
+$$;
+
+-- Nhân sự đang đăng nhập còn hiệu lực (khoá / nghỉ việc → NULL)
+CREATE OR REPLACE FUNCTION current_auth_staff_id() RETURNS bigint LANGUAGE sql STABLE SECURITY DEFINER
+SET search_path = trangway, public AS $$
+  SELECT id FROM staff WHERE auth_user_id = current_auth_uid()
+    AND status = &#x27;active&#x27; AND NOT is_locked AND work_status &lt;&gt; &#x27;resigned&#x27;
+$$;
+
+-- Người gọi có quyền quản trị nhân sự? (GĐ, PGĐ, Admin; service key; SQL Editor)
+CREATE OR REPLACE FUNCTION is_hr_admin() RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER
+SET search_path = trangway, public AS $$
+  SELECT coalesce((SELECT role IN (&#x27;director&#x27;,&#x27;deputy_director&#x27;,&#x27;admin&#x27;) FROM staff
+                    WHERE id = coalesce(current_auth_staff_id(), current_staff_id())
+                      AND status = &#x27;active&#x27; AND NOT is_locked), false)
+      OR coalesce(nullif(current_setting(&#x27;request.jwt.claims&#x27;, true), &#x27;&#x27;)::jsonb -&gt;&gt; &#x27;role&#x27;, &#x27;&#x27;) = &#x27;service_role&#x27;
+      OR (current_auth_uid() IS NULL AND nullif(current_setting(&#x27;app.current_staff_id&#x27;, true), &#x27;&#x27;) IS NULL
+          AND session_user IN (&#x27;postgres&#x27;,&#x27;supabase_admin&#x27;))   -- SQL Editor / migration, không có người đăng nhập
+$$;
+
+-- Đăng nhập bằng tên đăng nhập: app gọi lấy email rồi supabase.auth.signInWithPassword({ email, password })
+CREATE OR REPLACE FUNCTION fn_login_email(p_username text) RETURNS text LANGUAGE sql STABLE SECURITY DEFINER
+SET search_path = trangway, public AS $$
+  SELECT login_email FROM staff
+  WHERE lower(username) = lower(trim(p_username)) AND status = &#x27;active&#x27; AND NOT is_locked AND work_status &lt;&gt; &#x27;resigned&#x27;
+$$;
+
+-- Gọi ngay sau khi đăng nhập: ghi giờ đăng nhập, trả hồ sơ + cờ khoá / bắt đổi mật khẩu
+CREATE OR REPLACE FUNCTION fn_after_login()
+RETURNS TABLE (staff_id bigint, code text, full_name text, role staff_role, department text, job_position text,
+               must_change_password boolean, is_locked boolean, work_status staff_work_status)
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = trangway, public AS $$
+BEGIN
+  UPDATE staff s SET last_login_at = now() WHERE s.auth_user_id = current_auth_uid();
+  RETURN QUERY
+    SELECT s.id, s.code, s.full_name, s.role, d.name, jp.name, s.must_change_password, s.is_locked, s.work_status
+    FROM staff s
+    LEFT JOIN departments d    ON d.id = s.department_id
+    LEFT JOIN job_positions jp ON jp.id = s.job_position_id
+    WHERE s.auth_user_id = current_auth_uid();
+END $$;
+
+-- Gọi sau khi người dùng tự đổi mật khẩu (supabase.auth.updateUser({ password }))
+CREATE OR REPLACE FUNCTION fn_mark_password_changed() RETURNS void LANGUAGE sql SECURITY DEFINER
+SET search_path = trangway, public AS $$
+  UPDATE staff SET must_change_password = false, password_changed_at = now() WHERE auth_user_id = current_auth_uid()
+$$;
+
+-- Nối hồ sơ nhân sự với tài khoản Supabase Auth vừa tạo (Edge Function staff-account gọi)
+CREATE OR REPLACE FUNCTION fn_link_staff_account(p_staff_code text, p_auth_user_id uuid, p_login_email text,
+                                                 p_username text DEFAULT NULL)
+RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path = trangway, public AS $$
+BEGIN
+  IF NOT is_hr_admin() THEN RAISE EXCEPTION &#x27;Chỉ Giám đốc, Phó GĐ hoặc Admin được cấp tài khoản&#x27;; END IF;
+  UPDATE staff SET auth_user_id = p_auth_user_id, login_email = p_login_email,
+         username = coalesce(nullif(trim(p_username), &#x27;&#x27;), username), must_change_password = true
+   WHERE code = p_staff_code;
+  IF NOT FOUND THEN RAISE EXCEPTION &#x27;Không có nhân sự mã %&#x27;, p_staff_code; END IF;
+END $$;
+
+-- Khoá / mở khoá tài khoản (không cho tự khoá chính mình)
+CREATE OR REPLACE FUNCTION fn_set_staff_lock(p_staff_id bigint, p_locked boolean, p_reason text DEFAULT NULL)
+RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path = trangway, public AS $$
+BEGIN
+  IF NOT is_hr_admin() THEN RAISE EXCEPTION &#x27;Chỉ Giám đốc, Phó GĐ hoặc Admin được khoá tài khoản&#x27;; END IF;
+  IF p_locked AND p_staff_id = coalesce(current_auth_staff_id(), current_staff_id()) THEN
+    RAISE EXCEPTION &#x27;Không thể tự khoá tài khoản của chính mình&#x27;;
+  END IF;
+  UPDATE staff SET is_locked = p_locked, locked_reason = CASE WHEN p_locked THEN p_reason END WHERE id = p_staff_id;
+  IF NOT FOUND THEN RAISE EXCEPTION &#x27;Không có nhân sự id %&#x27;, p_staff_id; END IF;
+END $$;
 </pre></div>
 <div class="codebox">
 <div class="bar"><span>02_seed.sql — dữ liệu mẫu Tháng 10/2026 theo demo</span><button class="copy" type="button" data-target="sql-seed">Sao chép</button></div>
@@ -2078,19 +2429,66 @@ END $$;
 -- =====================================================================
 SET search_path = trangway, public;
 
--- ---------- Nhân sự ----------
-INSERT INTO staff (code, full_name, initials, phone, role, title) VALUES
- (&#x27;NV-001&#x27;,&#x27;Trần Thu Hà&#x27;,&#x27;TH&#x27;,&#x27;0988 123 456&#x27;,&#x27;team_lead&#x27;,&#x27;Trưởng nhóm Tuyển dụng VP · Quản trị viên&#x27;),
- (&#x27;NV-002&#x27;,&#x27;Vũ Văn Cường&#x27;,&#x27;VC&#x27;,&#x27;0912 000 002&#x27;,&#x27;recruiter&#x27;,&#x27;Chuyên viên tuyển dụng&#x27;),
- (&#x27;NV-003&#x27;,&#x27;Đỗ Minh Thắng&#x27;,&#x27;ĐT&#x27;,&#x27;0912 000 003&#x27;,&#x27;recruiter&#x27;,&#x27;Chuyên viên tuyển dụng&#x27;),
- (&#x27;NV-004&#x27;,&#x27;Nguyễn Tiến Đạt&#x27;,&#x27;NĐ&#x27;,&#x27;0912 000 004&#x27;,&#x27;team_lead&#x27;,&#x27;Trưởng nhóm Tuyển dụng HN&#x27;),
- (&#x27;NV-005&#x27;,&#x27;Giám đốc (mẫu)&#x27;,&#x27;GĐ&#x27;,&#x27;0912 000 005&#x27;,&#x27;director&#x27;,&#x27;Giám đốc&#x27;),
- (&#x27;NV-006&#x27;,&#x27;Kế toán (mẫu)&#x27;,&#x27;KT&#x27;,&#x27;0912 000 006&#x27;,&#x27;accountant&#x27;,&#x27;Kế toán&#x27;),
- (&#x27;NV-007&#x27;,&#x27;Điều phối (mẫu)&#x27;,&#x27;ĐP&#x27;,&#x27;0912 000 007&#x27;,&#x27;coordinator&#x27;,&#x27;Điều phối viên đưa đón&#x27;);
+-- ---------- [N1][N2] Phòng ban &amp; vị trí ----------
+INSERT INTO departments (code, name, sort_order) VALUES
+ (&#x27;PB-BGD&#x27;,&#x27;Ban Giám đốc&#x27;,1),
+ (&#x27;PB-TD&#x27;,&#x27;Phòng Tuyển dụng&#x27;,2),
+ (&#x27;PB-DP&#x27;,&#x27;Phòng Điều phối&#x27;,3),
+ (&#x27;PB-KT&#x27;,&#x27;Phòng Kế toán&#x27;,4),
+ (&#x27;PB-HC&#x27;,&#x27;Phòng Hành chính - IT&#x27;,5);
 
-INSERT INTO teams (code, name, region, leader_id) VALUES
- (&#x27;TD-VP&#x27;,&#x27;Tuyển dụng Vĩnh Phúc&#x27;,&#x27;Vĩnh Phúc&#x27;,(SELECT id FROM staff WHERE code=&#x27;NV-001&#x27;)),
- (&#x27;TD-HN&#x27;,&#x27;Tuyển dụng Hà Nội&#x27;,&#x27;Hà Nội&#x27;,     (SELECT id FROM staff WHERE code=&#x27;NV-004&#x27;));
+INSERT INTO job_positions (code, name, department_id, level, default_role, description, sort_order)
+SELECT x.code, x.name, d.id, x.lvl, x.role::staff_role, x.descr, x.ord
+FROM (VALUES
+ (&#x27;VT-GD&#x27;,  &#x27;Giám đốc&#x27;,               &#x27;PB-BGD&#x27;,1,&#x27;director&#x27;,       &#x27;Điều hành chung, duyệt tài chính, xem hoa hồng&#x27;,1),
+ (&#x27;VT-PGD&#x27;, &#x27;Phó Giám đốc&#x27;,           &#x27;PB-BGD&#x27;,2,&#x27;deputy_director&#x27;,&#x27;Phụ trách vận hành cung ứng&#x27;,2),
+ (&#x27;VT-TNTD&#x27;,&#x27;Trưởng nhóm tuyển dụng&#x27;, &#x27;PB-TD&#x27;, 3,&#x27;team_lead&#x27;,      &#x27;Quản lý nhóm, giao chỉ tiêu, duyệt tạm ứng&#x27;,1),
+ (&#x27;VT-CVTD&#x27;,&#x27;Chuyên viên tuyển dụng&#x27;, &#x27;PB-TD&#x27;, 5,&#x27;recruiter&#x27;,      &#x27;Tuyển và theo dõi người lao động&#x27;,2),
+ (&#x27;VT-DPV&#x27;, &#x27;Điều phối viên&#x27;,         &#x27;PB-DP&#x27;, 5,&#x27;coordinator&#x27;,    &#x27;Đưa đón, bàn giao, chấm công tại nhà máy&#x27;,1),
+ (&#x27;VT-KTT&#x27;, &#x27;Kế toán trưởng&#x27;,         &#x27;PB-KT&#x27;, 3,&#x27;accountant&#x27;,     &#x27;Chốt lương, thu chi&#x27;,1),
+ (&#x27;VT-KTV&#x27;, &#x27;Kế toán viên&#x27;,           &#x27;PB-KT&#x27;, 5,&#x27;accountant&#x27;,     &#x27;Nhập lương, tạm ứng&#x27;,2),
+ (&#x27;VT-QTHT&#x27;,&#x27;Quản trị hệ thống&#x27;,      &#x27;PB-HC&#x27;, 4,&#x27;admin&#x27;,          &#x27;Quản lý tài khoản, phân quyền, danh mục&#x27;,1)
+) x(code,name,dept,lvl,role,descr,ord)
+JOIN departments d ON d.code = x.dept;
+
+-- ---------- Nhân sự: chọn vị trí → trigger tự điền phòng ban + quyền ----------
+INSERT INTO staff (code, full_name, initials, phone, job_position_id, title, gender, hire_date, probation_end, work_status, username)
+SELECT x.code, x.name, x.ini, x.phone, jp.id, x.title, x.gender::gender_type, x.hire::date, x.prob::date,
+       x.ws::staff_work_status, x.username
+FROM (VALUES
+ (&#x27;NV-001&#x27;,&#x27;Trần Thu Hà&#x27;,&#x27;TH&#x27;,&#x27;0988 123 456&#x27;,&#x27;VT-TNTD&#x27;,&#x27;Trưởng nhóm Tuyển dụng VP · Quản trị viên&#x27;,&#x27;female&#x27;,&#x27;2024-03-01&#x27;,NULL,&#x27;official&#x27;,&#x27;tranthuha&#x27;),
+ (&#x27;NV-002&#x27;,&#x27;Vũ Văn Cường&#x27;,&#x27;VC&#x27;,&#x27;0912 000 002&#x27;,&#x27;VT-CVTD&#x27;,&#x27;Chuyên viên tuyển dụng&#x27;,&#x27;male&#x27;,&#x27;2025-01-06&#x27;,NULL,&#x27;official&#x27;,&#x27;vuvancuong&#x27;),
+ (&#x27;NV-003&#x27;,&#x27;Đỗ Minh Thắng&#x27;,&#x27;ĐT&#x27;,&#x27;0912 000 003&#x27;,&#x27;VT-CVTD&#x27;,&#x27;Chuyên viên tuyển dụng&#x27;,&#x27;male&#x27;,&#x27;2026-08-01&#x27;,&#x27;2026-10-31&#x27;,&#x27;probation&#x27;,&#x27;dominhthang&#x27;),
+ (&#x27;NV-004&#x27;,&#x27;Nguyễn Tiến Đạt&#x27;,&#x27;NĐ&#x27;,&#x27;0912 000 004&#x27;,&#x27;VT-TNTD&#x27;,&#x27;Trưởng nhóm Tuyển dụng HN&#x27;,&#x27;male&#x27;,&#x27;2024-06-03&#x27;,NULL,&#x27;official&#x27;,&#x27;nguyentiendat&#x27;),
+ (&#x27;NV-005&#x27;,&#x27;Giám đốc (mẫu)&#x27;,&#x27;GĐ&#x27;,&#x27;0912 000 005&#x27;,&#x27;VT-GD&#x27;,&#x27;Giám đốc&#x27;,NULL,&#x27;2023-01-02&#x27;,NULL,&#x27;official&#x27;,&#x27;giamdoc&#x27;),
+ (&#x27;NV-006&#x27;,&#x27;Kế toán (mẫu)&#x27;,&#x27;KT&#x27;,&#x27;0912 000 006&#x27;,&#x27;VT-KTT&#x27;,&#x27;Kế toán&#x27;,NULL,&#x27;2023-05-02&#x27;,NULL,&#x27;official&#x27;,&#x27;ketoan&#x27;),
+ (&#x27;NV-007&#x27;,&#x27;Điều phối (mẫu)&#x27;,&#x27;ĐP&#x27;,&#x27;0912 000 007&#x27;,&#x27;VT-DPV&#x27;,&#x27;Điều phối viên đưa đón&#x27;,NULL,&#x27;2025-09-01&#x27;,NULL,&#x27;official&#x27;,NULL)
+) x(code,name,ini,phone,pos,title,gender,hire,prob,ws,username)
+JOIN job_positions jp ON jp.code = x.pos
+ORDER BY x.code;
+
+UPDATE staff s SET manager_staff_id = m.id
+FROM (VALUES (&#x27;NV-001&#x27;,&#x27;NV-005&#x27;),(&#x27;NV-002&#x27;,&#x27;NV-001&#x27;),(&#x27;NV-003&#x27;,&#x27;NV-001&#x27;),(&#x27;NV-004&#x27;,&#x27;NV-005&#x27;),
+             (&#x27;NV-006&#x27;,&#x27;NV-005&#x27;),(&#x27;NV-007&#x27;,&#x27;NV-001&#x27;)) x(staff_code, manager_code)
+JOIN staff m ON m.code = x.manager_code
+WHERE s.code = x.staff_code;
+
+UPDATE departments d SET manager_staff_id = s.id
+FROM (VALUES (&#x27;PB-BGD&#x27;,&#x27;NV-005&#x27;),(&#x27;PB-TD&#x27;,&#x27;NV-001&#x27;),(&#x27;PB-KT&#x27;,&#x27;NV-006&#x27;)) x(dept, staff_code)
+JOIN staff s ON s.code = x.staff_code
+WHERE d.code = x.dept;
+
+-- Tài khoản mẫu: Giám đốc và Trần Thu Hà đã có tài khoản (auth_user_id giả lập; trên Supabase do Edge Function tạo)
+UPDATE staff SET auth_user_id = x.uid::uuid, login_email = x.email,
+       must_change_password = x.must, password_changed_at = CASE WHEN NOT x.must THEN now() END
+FROM (VALUES (&#x27;NV-005&#x27;,&#x27;00000000-0000-0000-0000-000000000005&#x27;,&#x27;giamdoc@trangway.local&#x27;,false),
+             (&#x27;NV-001&#x27;,&#x27;00000000-0000-0000-0000-000000000001&#x27;,&#x27;hatt@trangway.vn&#x27;,false),
+             (&#x27;NV-002&#x27;,&#x27;00000000-0000-0000-0000-000000000002&#x27;,&#x27;vuvancuong@trangway.local&#x27;,true)) x(code,uid,email,must)
+WHERE staff.code = x.code;
+
+INSERT INTO teams (code, name, region, department_id, leader_id) VALUES
+ (&#x27;TD-VP&#x27;,&#x27;Tuyển dụng Vĩnh Phúc&#x27;,&#x27;Vĩnh Phúc&#x27;,(SELECT id FROM departments WHERE code=&#x27;PB-TD&#x27;),(SELECT id FROM staff WHERE code=&#x27;NV-001&#x27;)),
+ (&#x27;TD-HN&#x27;,&#x27;Tuyển dụng Hà Nội&#x27;,&#x27;Hà Nội&#x27;,     (SELECT id FROM departments WHERE code=&#x27;PB-TD&#x27;),(SELECT id FROM staff WHERE code=&#x27;NV-004&#x27;));
 
 INSERT INTO team_members (team_id, staff_id)
 SELECT t.id, s.id FROM teams t JOIN staff s ON
@@ -2633,6 +3031,127 @@ SELECT * FROM v_period_dashboard WHERE code = &#x27;2026-10&#x27;;
 
 -- 12. Chốt sổ chu kỳ (sinh lương theo công, chốt vào payrolls, khoá kỳ)
 -- SELECT fn_close_period(&#x27;2026-10&#x27;, 6);
+
+-- =====================================================================
+-- v1.2 · NHÂN SỰ &amp; TÀI KHOẢN
+-- =====================================================================
+
+-- 13. Màn hình Nhân sự: danh sách + trạng thái tài khoản (locked / resigned tô đỏ)
+SELECT code, full_name, department_name, position_name, role, manager_name, work_status,
+       username, has_account, account_state, last_login_at
+FROM v_staff_directory ORDER BY department_code, position_level, code;
+
+-- 14. Cây phòng ban
+SELECT code, name, manager_name, headcount, probation, no_account, locked, position_count
+FROM v_department_headcount ORDER BY code;
+
+-- 15. Vị trí theo phòng ban
+SELECT d.name AS phong_ban, jp.code, jp.name, jp.level, jp.default_role, jp.description
+FROM job_positions jp JOIN departments d ON d.id = jp.department_id ORDER BY d.sort_order, jp.level;
+
+-- 16. Đăng nhập bằng tên đăng nhập (app gọi trước signInWithPassword)
+SELECT fn_login_email(&#x27;TranThuHa&#x27;);
+
+-- 17. Thêm nhân sự mới chỉ cần chọn vị trí: phòng ban + quyền tự điền (thử rồi huỷ)
+BEGIN;
+INSERT INTO staff (code, full_name, phone, job_position_id, hire_date, probation_end, work_status, username)
+SELECT &#x27;NV-099&#x27;, &#x27;Nhân sự Thử&#x27;, &#x27;0900 000 099&#x27;, id, current_date, current_date + 60, &#x27;probation&#x27;, &#x27; NhanSu.Thu &#x27;
+FROM job_positions WHERE code = &#x27;VT-KTV&#x27;
+RETURNING code, role, department_id, username;
+ROLLBACK;
+
+-- 18. Khoá tài khoản (chạy trong SQL Editor hoặc backend có quyền Admin)
+-- SELECT fn_set_staff_lock((SELECT id FROM staff WHERE code = &#x27;NV-002&#x27;), true, &#x27;Nghi lộ mật khẩu&#x27;);
+
+-- 19. Nghỉ việc: tài khoản tự ngừng hoạt động, giữ lịch sử
+-- UPDATE staff SET work_status = &#x27;resigned&#x27;, leave_date = &#x27;2026-10-31&#x27; WHERE code = &#x27;NV-003&#x27;;
+</pre></div>
+<div class="codebox">
+<div class="bar"><span class="newtxt">supabase/functions/staff-account/index.ts — cấp tài khoản, mật khẩu, khoá (v1.2)</span><button class="copy" type="button" data-target="ts-fn">Sao chép</button></div>
+<pre id="ts-fn" class="pre-new">// Supabase Edge Function: staff-account
+// Tạo tài khoản, cấp lại mật khẩu, khoá/mở khoá cho nhân sự Trang Way.
+// Chỉ Giám đốc / Phó GĐ / Admin gọi được (kiểm bằng trangway.is_hr_admin()).
+// Dùng với database v1.2 (01_schema.sql). Mật khẩu chỉ nằm trong Supabase Auth.
+// Deploy: supabase functions deploy staff-account
+//
+// Gọi từ app:
+//   supabase.functions.invoke(&#x27;staff-account&#x27;, { body: {
+//     action: &#x27;create&#x27;, staff_code: &#x27;NV-003&#x27;, username: &#x27;tranthuha&#x27;,
+//     email: &#x27;hatt@trangway.vn&#x27;,        // bỏ trống → tranthuha@trangway.local
+//     temp_password: &#x27;TrangWay@2026&#x27; } })
+//   { action: &#x27;reset_password&#x27;, staff_code, temp_password }
+//   { action: &#x27;lock&#x27;, staff_code, reason }   |   { action: &#x27;unlock&#x27;, staff_code }
+import { createClient } from &quot;jsr:@supabase/supabase-js@2&quot;;
+
+const cors = {
+  &quot;Access-Control-Allow-Origin&quot;: &quot;*&quot;,
+  &quot;Access-Control-Allow-Headers&quot;: &quot;authorization, x-client-info, apikey, content-type&quot;,
+};
+const json = (body: unknown, status = 200) =&gt;
+  new Response(JSON.stringify(body), { status, headers: { ...cors, &quot;Content-Type&quot;: &quot;application/json&quot; } });
+
+Deno.serve(async (req) =&gt; {
+  if (req.method === &quot;OPTIONS&quot;) return new Response(&quot;ok&quot;, { headers: cors });
+  const url = Deno.env.get(&quot;SUPABASE_URL&quot;)!;
+
+  // 1. Kiểm quyền người gọi bằng chính token của họ
+  const caller = createClient(url, Deno.env.get(&quot;SUPABASE_ANON_KEY&quot;)!, {
+    global: { headers: { Authorization: req.headers.get(&quot;Authorization&quot;) ?? &quot;&quot; } },
+    db: { schema: &quot;trangway&quot; },
+  });
+  const { data: allowed, error: permErr } = await caller.rpc(&quot;is_hr_admin&quot;);
+  if (permErr || !allowed) return json({ error: &quot;Chỉ Giám đốc, Phó GĐ hoặc Admin được quản lý tài khoản&quot; }, 403);
+
+  const admin = createClient(url, Deno.env.get(&quot;SUPABASE_SERVICE_ROLE_KEY&quot;)!, { db: { schema: &quot;trangway&quot; } });
+  const body = await req.json();
+  const { action, staff_code } = body;
+
+  const { data: staff, error: staffErr } = await admin
+    .from(&quot;staff&quot;).select(&quot;id, auth_user_id, username, login_email&quot;).eq(&quot;code&quot;, staff_code).single();
+  if (staffErr || !staff) return json({ error: `Không có nhân sự mã ${staff_code}` }, 404);
+
+  const strong = (p: string) =&gt; typeof p === &quot;string&quot; &amp;&amp; p.length &gt;= 8 &amp;&amp; /[A-Za-z]/.test(p) &amp;&amp; /\d/.test(p);
+
+  if (action === &quot;create&quot;) {
+    if (staff.auth_user_id) return json({ error: &quot;Nhân sự này đã có tài khoản&quot; }, 409);
+    const username = String(body.username ?? &quot;&quot;).trim().toLowerCase();
+    if (!/^[a-z0-9._]{3,32}$/.test(username)) return json({ error: &quot;Tên đăng nhập 3–32 ký tự: chữ thường, số, dấu chấm, gạch dưới&quot; }, 400);
+    if (!strong(body.temp_password)) return json({ error: &quot;Mật khẩu tạm tối thiểu 8 ký tự, có chữ và số&quot; }, 400);
+    const email = String(body.email || `${username}@trangway.local`).trim().toLowerCase();
+    const { data: created, error } = await admin.auth.admin.createUser({ email, password: body.temp_password, email_confirm: true });
+    if (error || !created.user) return json({ error: error?.message ?? &quot;Không tạo được tài khoản&quot; }, 400);
+    const { error: linkErr } = await admin.rpc(&quot;fn_link_staff_account&quot;,
+      { p_staff_code: staff_code, p_auth_user_id: created.user.id, p_login_email: email, p_username: username });
+    if (linkErr) {
+      await admin.auth.admin.deleteUser(created.user.id);   // không để lại tài khoản mồ côi
+      return json({ error: linkErr.message }, 400);
+    }
+    return json({ ok: true, login: username, email });
+  }
+
+  if (!staff.auth_user_id) return json({ error: &quot;Nhân sự này chưa có tài khoản&quot; }, 400);
+
+  if (action === &quot;reset_password&quot;) {
+    if (!strong(body.temp_password)) return json({ error: &quot;Mật khẩu tạm tối thiểu 8 ký tự, có chữ và số&quot; }, 400);
+    const { error } = await admin.auth.admin.updateUserById(staff.auth_user_id, { password: body.temp_password });
+    if (error) return json({ error: error.message }, 400);
+    await admin.from(&quot;staff&quot;).update({ must_change_password: true }).eq(&quot;id&quot;, staff.id);
+    return json({ ok: true });
+  }
+
+  if (action === &quot;lock&quot; || action === &quot;unlock&quot;) {
+    const lock = action === &quot;lock&quot;;
+    // Khoá cả phía Supabase Auth để phiên đăng nhập cũ hết hiệu lực
+    const { error } = await admin.auth.admin.updateUserById(staff.auth_user_id, { ban_duration: lock ? &quot;876000h&quot; : &quot;none&quot; });
+    if (error) return json({ error: error.message }, 400);
+    const { error: lockErr } = await admin.rpc(&quot;fn_set_staff_lock&quot;,
+      { p_staff_id: staff.id, p_locked: lock, p_reason: body.reason ?? null });
+    if (lockErr) return json({ error: lockErr.message }, 400);
+    return json({ ok: true });
+  }
+
+  return json({ error: &quot;action phải là create, reset_password, lock hoặc unlock&quot; }, 400);
+});
 </pre></div>
 </section>
 </main>

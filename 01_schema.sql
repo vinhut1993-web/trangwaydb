@@ -15,6 +15,13 @@
 --   [B9] Cảnh báo trùng hồ sơ ............. fn_find_worker_duplicates(), duplicate_alerts
 --   [B10] Nhập lương nhiều lần ............ salary_entries, salary_entry_history
 --   [B11] Lương theo từng đợt / công ty ... v_placement_pay, fn_generate_wage_entries()
+--  v1.2 bổ sung:
+--   [N1] Phòng ban ........................ departments, v_department_headcount
+--   [N2] Vị trí / chức vụ ................. job_positions (quyền mặc định theo vị trí)
+--   [N3] Hồ sơ nhân sự .................... staff (+ phòng ban, vị trí, ngày vào làm, thử việc, nghỉ việc…)
+--   [N4] Tài khoản đăng nhập .............. staff (username, khoá, bắt đổi mật khẩu), fn_login_email(),
+--                                           fn_after_login(), fn_link_staff_account(), fn_set_staff_lock()
+--        Mật khẩu KHÔNG lưu ở bảng nào của trangway: Supabase Auth (auth.users) giữ mật khẩu đã băm.
 -- =====================================================================
 
 CREATE EXTENSION IF NOT EXISTS btree_gist;   -- cho ràng buộc chống chồng thời gian (EXCLUDE)
@@ -46,6 +53,8 @@ CREATE TYPE payroll_status    AS ENUM ('draft','confirmed','paid');
 CREATE TYPE txn_type          AS ENUM ('income','expense');
 CREATE TYPE txn_status        AS ENUM ('pending','approved','completed','cancelled');
 CREATE TYPE audit_action      AS ENUM ('INSERT','UPDATE','DELETE','VIEW_SENSITIVE','EXPORT','LOGIN','APPROVE');
+-- v1.2
+CREATE TYPE staff_work_status AS ENUM ('probation','official','on_leave','resigned'); -- Thử việc / Chính thức / Tạm nghỉ / Đã nghỉ
 -- v1.1
 CREATE TYPE handover_status   AS ENUM ('pending','handed_over','received','refused');   -- Chờ bàn giao / Đã bàn giao / Đã tiếp nhận / Từ chối nhận
 CREATE TYPE wage_unit         AS ENUM ('day','shift','hour','month','product');         -- Đơn vị tính lương
@@ -65,28 +74,92 @@ CREATE OR REPLACE FUNCTION normalize_phone(p text) RETURNS text LANGUAGE sql IMM
 $$;
 
 -- ---------------------------------------------------------------------
--- 1. NHÂN SỰ NỘI BỘ & NHÓM
+-- 1. NHÂN SỰ NỘI BỘ: PHÒNG BAN, VỊ TRÍ, NHÂN SỰ, TÀI KHOẢN, NHÓM
 -- ---------------------------------------------------------------------
+-- [N1] Phòng ban (manager_staff_id được thêm sau khi có bảng staff)
+CREATE TABLE departments (
+  id            bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  code          text UNIQUE NOT NULL,              -- PB-TD
+  name          text NOT NULL,                     -- Phòng Tuyển dụng
+  parent_id     bigint REFERENCES departments(id), -- phòng ban cha (để trống nếu cấp cao nhất)
+  phone         text,
+  email         text,
+  sort_order    smallint NOT NULL DEFAULT 0,
+  note          text,
+  status        record_status NOT NULL DEFAULT 'active',
+  created_at    timestamptz NOT NULL DEFAULT now(),
+  updated_at    timestamptz NOT NULL DEFAULT now(),
+  CHECK (parent_id IS NULL OR parent_id <> id)
+);
+
+-- [N2] Vị trí / chức vụ: thuộc một phòng ban, có quyền hệ thống mặc định
+CREATE TABLE job_positions (
+  id            bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  code          text UNIQUE NOT NULL,              -- VT-CVTD
+  name          text NOT NULL,                     -- Chuyên viên tuyển dụng
+  department_id bigint NOT NULL REFERENCES departments(id),
+  level         smallint NOT NULL DEFAULT 5 CHECK (level BETWEEN 1 AND 9), -- Cấp bậc, 1 = cao nhất
+  default_role  staff_role NOT NULL,               -- Quyền tự gán khi nhân sự nhận vị trí này
+  description   text,                              -- Mô tả công việc
+  sort_order    smallint NOT NULL DEFAULT 0,
+  status        record_status NOT NULL DEFAULT 'active',
+  created_at    timestamptz NOT NULL DEFAULT now(),
+  updated_at    timestamptz NOT NULL DEFAULT now()
+);
+
+-- [N3][N4] Nhân sự nội bộ + tài khoản đăng nhập
 CREATE TABLE staff (
   id            bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  auth_user_id  uuid UNIQUE,                       -- liên kết auth.users (Supabase) nếu dùng
+  auth_user_id  uuid UNIQUE,                       -- tài khoản Supabase Auth (auth.users.id); mật khẩu nằm ở đó
   code          text UNIQUE NOT NULL,              -- NV-001
   full_name     text NOT NULL,
   initials      text,                              -- TH, VC, ĐT (avatar chữ)
   email         text UNIQUE,
   phone         text,
-  role          staff_role NOT NULL DEFAULT 'recruiter',
-  title         text,                              -- "Trưởng nhóm Tuyển dụng VP"
+  role          staff_role NOT NULL,               -- Quyền hệ thống; để trống thì lấy theo vị trí
+  title         text,                              -- Chức danh hiển thị tự do: "Trưởng nhóm Tuyển dụng VP"
   status        record_status NOT NULL DEFAULT 'active',
+  -- [N3] Hồ sơ nhân sự
+  department_id    bigint REFERENCES departments(id),   -- Phòng ban (trigger lấy theo vị trí)
+  job_position_id  bigint REFERENCES job_positions(id), -- Vị trí / chức vụ
+  manager_staff_id bigint REFERENCES staff(id),         -- Quản lý trực tiếp
+  gender           gender_type,
+  date_of_birth    date,
+  address          text,
+  hire_date        date,                           -- Ngày vào làm
+  probation_end    date,                           -- Ngày hết thử việc
+  leave_date       date,                           -- Ngày nghỉ việc (trigger điền khi chuyển "đã nghỉ")
+  work_status      staff_work_status NOT NULL DEFAULT 'official', -- Tình trạng làm việc
+  avatar_path      text,                           -- Ảnh đại diện (storage)
+  note             text,
+  -- [N4] Tài khoản đăng nhập (không có cột mật khẩu)
+  username         text,                           -- Tên đăng nhập, duy nhất, a-z 0-9 . _
+  login_email      text,                           -- Email đăng nhập Supabase (thật hoặc username@trangway.local)
+  must_change_password boolean NOT NULL DEFAULT true, -- Bắt đổi mật khẩu ở lần đăng nhập tới
+  password_changed_at  timestamptz,                -- Lần đổi mật khẩu gần nhất
+  is_locked        boolean NOT NULL DEFAULT false, -- Tài khoản bị khoá
+  locked_reason    text,                           -- Lý do khoá
+  locked_at        timestamptz,                    -- Thời điểm khoá (trigger ghi)
+  last_login_at    timestamptz,                    -- Lần đăng nhập gần nhất
   created_at    timestamptz NOT NULL DEFAULT now(),
-  updated_at    timestamptz NOT NULL DEFAULT now()
+  updated_at    timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT staff_username_format CHECK (username IS NULL OR username ~ '^[a-z0-9._]{3,32}$'),
+  CONSTRAINT staff_dates_check CHECK ((leave_date IS NULL OR hire_date IS NULL OR leave_date >= hire_date)
+                                  AND (probation_end IS NULL OR hire_date IS NULL OR probation_end >= hire_date)),
+  CONSTRAINT staff_not_own_manager CHECK (manager_staff_id IS NULL OR manager_staff_id <> id)
 );
+CREATE UNIQUE INDEX staff_username_uq    ON staff (lower(username))    WHERE username IS NOT NULL;
+CREATE UNIQUE INDEX staff_login_email_uq ON staff (lower(login_email)) WHERE login_email IS NOT NULL;
+
+-- Trưởng phòng
+ALTER TABLE departments ADD COLUMN manager_staff_id bigint REFERENCES staff(id);
 
 CREATE TABLE teams (
   id          bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   code        text UNIQUE NOT NULL,                -- TD-VP
   name        text NOT NULL,                       -- Tuyển dụng Vĩnh Phúc
   region      text,                                -- Vĩnh Phúc / Hà Nội
+  department_id bigint REFERENCES departments(id), -- [N1] Nhóm thuộc phòng ban
   leader_id   bigint REFERENCES staff(id),
   status      record_status NOT NULL DEFAULT 'active',
   created_at  timestamptz NOT NULL DEFAULT now()
@@ -714,8 +787,14 @@ CREATE TABLE audit_logs (
 );
 
 -- App đặt người thao tác bằng: SET LOCAL app.current_staff_id = '1';
-CREATE OR REPLACE FUNCTION current_staff_id() RETURNS bigint LANGUAGE sql STABLE AS $$
-  SELECT nullif(current_setting('app.current_staff_id', true), '')::bigint
+-- Ưu tiên app.current_staff_id (backend tự đặt); nếu gọi thẳng qua Supabase thì lấy theo tài khoản đăng nhập
+CREATE OR REPLACE FUNCTION current_staff_id() RETURNS bigint LANGUAGE sql STABLE SECURITY DEFINER
+SET search_path = trangway, public AS $$
+  SELECT coalesce(
+    nullif(current_setting('app.current_staff_id', true), '')::bigint,
+    (SELECT id FROM staff WHERE auth_user_id =
+       nullif(coalesce(nullif(current_setting('request.jwt.claim.sub', true), ''),
+                       nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'sub'), '')::uuid))
 $$;
 
 CREATE OR REPLACE FUNCTION audit_trigger() RETURNS trigger LANGUAGE plpgsql AS $$
@@ -838,9 +917,44 @@ BEGIN
   RETURN NEW;
 END $$;
 
+-- [N2][N3][N4] Nhân sự: chọn vị trí → tự lấy phòng ban + quyền; chuẩn hoá tên đăng nhập;
+--               nghỉ việc → ngừng hoạt động; ghi thời điểm khoá
+CREATE OR REPLACE FUNCTION staff_before() RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE jp record;
+BEGIN
+  IF NEW.job_position_id IS NOT NULL AND
+     (TG_OP = 'INSERT' OR NEW.job_position_id IS DISTINCT FROM OLD.job_position_id) THEN
+    SELECT department_id, default_role INTO jp FROM job_positions WHERE id = NEW.job_position_id;
+    NEW.department_id := jp.department_id;
+    -- Giữ quyền người dùng tự chọn trong cùng lần lưu; không chọn thì lấy theo vị trí
+    IF (TG_OP = 'INSERT' AND NEW.role IS NULL)
+       OR (TG_OP = 'UPDATE' AND NEW.role IS NOT DISTINCT FROM OLD.role) THEN
+      NEW.role := jp.default_role;
+    END IF;
+  END IF;
+  NEW.username    := lower(nullif(trim(NEW.username), ''));
+  NEW.login_email := lower(nullif(trim(NEW.login_email), ''));
+  IF NEW.work_status = 'resigned' THEN
+    NEW.status := 'inactive';
+    NEW.leave_date := coalesce(NEW.leave_date, current_date);
+  ELSIF TG_OP = 'UPDATE' AND OLD.work_status = 'resigned' THEN
+    NEW.status := 'active';
+    NEW.leave_date := NULL;
+  END IF;
+  IF NEW.is_locked AND (TG_OP = 'INSERT' OR NOT OLD.is_locked) THEN
+    NEW.locked_at := now();
+  ELSIF NOT NEW.is_locked THEN
+    NEW.locked_at := NULL; NEW.locked_reason := NULL;
+  END IF;
+  RETURN NEW;
+END $$;
+
 -- ---------------------------------------------------------------------
 -- GẮN TRIGGER
 -- ---------------------------------------------------------------------
+CREATE TRIGGER trg_staff_before  BEFORE INSERT OR UPDATE ON staff FOR EACH ROW EXECUTE FUNCTION staff_before();
+CREATE TRIGGER trg_dept_upd      BEFORE UPDATE ON departments   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE TRIGGER trg_jobpos_upd    BEFORE UPDATE ON job_positions FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 CREATE TRIGGER trg_staff_upd     BEFORE UPDATE ON staff     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 CREATE TRIGGER trg_companies_upd BEFORE UPDATE ON companies FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 CREATE TRIGGER trg_superv_upd    BEFORE UPDATE ON company_supervisors FOR EACH ROW EXECUTE FUNCTION set_updated_at();
@@ -869,10 +983,15 @@ CREATE TRIGGER trg_audit_payroll   AFTER INSERT OR UPDATE OR DELETE ON payrolls 
 CREATE TRIGGER trg_audit_salary    AFTER INSERT OR UPDATE OR DELETE ON salary_entries       FOR EACH ROW EXECUTE FUNCTION audit_trigger();
 CREATE TRIGGER trg_audit_handover  AFTER INSERT OR UPDATE OR DELETE ON handovers            FOR EACH ROW EXECUTE FUNCTION audit_trigger();
 CREATE TRIGGER trg_audit_rates     AFTER INSERT OR UPDATE OR DELETE ON position_wage_rates  FOR EACH ROW EXECUTE FUNCTION audit_trigger();
+CREATE TRIGGER trg_audit_dept      AFTER INSERT OR UPDATE OR DELETE ON departments          FOR EACH ROW EXECUTE FUNCTION audit_trigger();
+CREATE TRIGGER trg_audit_jobpos    AFTER INSERT OR UPDATE OR DELETE ON job_positions        FOR EACH ROW EXECUTE FUNCTION audit_trigger();
 
 -- ---------------------------------------------------------------------
 -- INDEX
 -- ---------------------------------------------------------------------
+CREATE INDEX ON job_positions (department_id);
+CREATE INDEX ON staff (department_id);
+CREATE INDEX ON staff (job_position_id);
 CREATE INDEX ON orders (period_id, company_id);
 CREATE INDEX ON order_positions (order_id);
 CREATE INDEX ON workers (status, current_company_id);
@@ -1352,4 +1471,120 @@ BEGIN
   GET DIAGNOSTICS n = ROW_COUNT;
   UPDATE periods SET status = 'closed', closed_at = now(), closed_by = p_staff_id WHERE id = v_id;
   RETURN n;
+END $$;
+
+-- =====================================================================
+-- v1.2 · NHÂN SỰ & TÀI KHOẢN
+-- =====================================================================
+
+-- [N3][N4] Danh bạ nhân sự cho màn hình Nhân sự. Không có mật khẩu.
+--          account_state để app tô màu (locked / resigned hiện đỏ).
+CREATE VIEW v_staff_directory AS
+SELECT s.id, s.code, s.full_name, s.initials, s.gender, s.date_of_birth, s.phone, s.email,
+       s.department_id, d.code AS department_code, d.name AS department_name,
+       s.job_position_id, jp.code AS position_code, jp.name AS position_name, jp.level AS position_level,
+       s.title, s.role, s.manager_staff_id, m.full_name AS manager_name,
+       (SELECT string_agg(t.name, ', ' ORDER BY t.name) FROM team_members tm JOIN teams t ON t.id = tm.team_id
+         WHERE tm.staff_id = s.id) AS teams,
+       s.hire_date, s.probation_end, s.leave_date, s.work_status,
+       s.username, s.login_email, (s.auth_user_id IS NOT NULL) AS has_account,
+       s.must_change_password, s.password_changed_at, s.is_locked, s.locked_reason, s.last_login_at,
+       CASE WHEN s.work_status = 'resigned' THEN 'resigned'      -- Đã nghỉ việc
+            WHEN s.is_locked                THEN 'locked'        -- Bị khoá
+            WHEN s.auth_user_id IS NULL     THEN 'no_account'    -- Chưa có tài khoản
+            WHEN s.must_change_password     THEN 'must_change'   -- Chờ đổi mật khẩu
+            ELSE 'active' END AS account_state,                  -- Đang hoạt động
+       s.status, s.created_at
+FROM staff s
+LEFT JOIN departments d    ON d.id = s.department_id
+LEFT JOIN job_positions jp ON jp.id = s.job_position_id
+LEFT JOIN staff m          ON m.id = s.manager_staff_id;
+
+-- [N1] Số nhân sự theo phòng ban
+CREATE VIEW v_department_headcount AS
+SELECT d.id AS department_id, d.code, d.name, d.parent_id, mg.full_name AS manager_name, d.status,
+       count(s.id) FILTER (WHERE s.work_status <> 'resigned') AS headcount,
+       count(s.id) FILTER (WHERE s.work_status = 'probation') AS probation,
+       count(s.id) FILTER (WHERE s.auth_user_id IS NULL AND s.work_status <> 'resigned') AS no_account,
+       count(s.id) FILTER (WHERE s.is_locked) AS locked,
+       (SELECT count(*) FROM job_positions jp WHERE jp.department_id = d.id AND jp.status = 'active') AS position_count
+FROM departments d
+LEFT JOIN staff s  ON s.department_id = d.id
+LEFT JOIN staff mg ON mg.id = d.manager_staff_id
+GROUP BY d.id, mg.full_name;
+
+-- [N4] Người đang đăng nhập (Supabase Auth đặt JWT vào request.jwt.claims; Postgres thường thì trả NULL)
+CREATE OR REPLACE FUNCTION current_auth_uid() RETURNS uuid LANGUAGE sql STABLE AS $$
+  SELECT nullif(coalesce(nullif(current_setting('request.jwt.claim.sub', true), ''),
+                         nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'sub'), '')::uuid
+$$;
+
+-- Nhân sự đang đăng nhập còn hiệu lực (khoá / nghỉ việc → NULL)
+CREATE OR REPLACE FUNCTION current_auth_staff_id() RETURNS bigint LANGUAGE sql STABLE SECURITY DEFINER
+SET search_path = trangway, public AS $$
+  SELECT id FROM staff WHERE auth_user_id = current_auth_uid()
+    AND status = 'active' AND NOT is_locked AND work_status <> 'resigned'
+$$;
+
+-- Người gọi có quyền quản trị nhân sự? (GĐ, PGĐ, Admin; service key; SQL Editor)
+CREATE OR REPLACE FUNCTION is_hr_admin() RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER
+SET search_path = trangway, public AS $$
+  SELECT coalesce((SELECT role IN ('director','deputy_director','admin') FROM staff
+                    WHERE id = coalesce(current_auth_staff_id(), current_staff_id())
+                      AND status = 'active' AND NOT is_locked), false)
+      OR coalesce(nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'role', '') = 'service_role'
+      OR (current_auth_uid() IS NULL AND nullif(current_setting('app.current_staff_id', true), '') IS NULL
+          AND session_user IN ('postgres','supabase_admin'))   -- SQL Editor / migration, không có người đăng nhập
+$$;
+
+-- Đăng nhập bằng tên đăng nhập: app gọi lấy email rồi supabase.auth.signInWithPassword({ email, password })
+CREATE OR REPLACE FUNCTION fn_login_email(p_username text) RETURNS text LANGUAGE sql STABLE SECURITY DEFINER
+SET search_path = trangway, public AS $$
+  SELECT login_email FROM staff
+  WHERE lower(username) = lower(trim(p_username)) AND status = 'active' AND NOT is_locked AND work_status <> 'resigned'
+$$;
+
+-- Gọi ngay sau khi đăng nhập: ghi giờ đăng nhập, trả hồ sơ + cờ khoá / bắt đổi mật khẩu
+CREATE OR REPLACE FUNCTION fn_after_login()
+RETURNS TABLE (staff_id bigint, code text, full_name text, role staff_role, department text, job_position text,
+               must_change_password boolean, is_locked boolean, work_status staff_work_status)
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = trangway, public AS $$
+BEGIN
+  UPDATE staff s SET last_login_at = now() WHERE s.auth_user_id = current_auth_uid();
+  RETURN QUERY
+    SELECT s.id, s.code, s.full_name, s.role, d.name, jp.name, s.must_change_password, s.is_locked, s.work_status
+    FROM staff s
+    LEFT JOIN departments d    ON d.id = s.department_id
+    LEFT JOIN job_positions jp ON jp.id = s.job_position_id
+    WHERE s.auth_user_id = current_auth_uid();
+END $$;
+
+-- Gọi sau khi người dùng tự đổi mật khẩu (supabase.auth.updateUser({ password }))
+CREATE OR REPLACE FUNCTION fn_mark_password_changed() RETURNS void LANGUAGE sql SECURITY DEFINER
+SET search_path = trangway, public AS $$
+  UPDATE staff SET must_change_password = false, password_changed_at = now() WHERE auth_user_id = current_auth_uid()
+$$;
+
+-- Nối hồ sơ nhân sự với tài khoản Supabase Auth vừa tạo (Edge Function staff-account gọi)
+CREATE OR REPLACE FUNCTION fn_link_staff_account(p_staff_code text, p_auth_user_id uuid, p_login_email text,
+                                                 p_username text DEFAULT NULL)
+RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path = trangway, public AS $$
+BEGIN
+  IF NOT is_hr_admin() THEN RAISE EXCEPTION 'Chỉ Giám đốc, Phó GĐ hoặc Admin được cấp tài khoản'; END IF;
+  UPDATE staff SET auth_user_id = p_auth_user_id, login_email = p_login_email,
+         username = coalesce(nullif(trim(p_username), ''), username), must_change_password = true
+   WHERE code = p_staff_code;
+  IF NOT FOUND THEN RAISE EXCEPTION 'Không có nhân sự mã %', p_staff_code; END IF;
+END $$;
+
+-- Khoá / mở khoá tài khoản (không cho tự khoá chính mình)
+CREATE OR REPLACE FUNCTION fn_set_staff_lock(p_staff_id bigint, p_locked boolean, p_reason text DEFAULT NULL)
+RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path = trangway, public AS $$
+BEGIN
+  IF NOT is_hr_admin() THEN RAISE EXCEPTION 'Chỉ Giám đốc, Phó GĐ hoặc Admin được khoá tài khoản'; END IF;
+  IF p_locked AND p_staff_id = coalesce(current_auth_staff_id(), current_staff_id()) THEN
+    RAISE EXCEPTION 'Không thể tự khoá tài khoản của chính mình';
+  END IF;
+  UPDATE staff SET is_locked = p_locked, locked_reason = CASE WHEN p_locked THEN p_reason END WHERE id = p_staff_id;
+  IF NOT FOUND THEN RAISE EXCEPTION 'Không có nhân sự id %', p_staff_id; END IF;
 END $$;

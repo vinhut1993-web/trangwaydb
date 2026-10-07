@@ -4,19 +4,66 @@
 -- =====================================================================
 SET search_path = trangway, public;
 
--- ---------- Nhân sự ----------
-INSERT INTO staff (code, full_name, initials, phone, role, title) VALUES
- ('NV-001','Trần Thu Hà','TH','0988 123 456','team_lead','Trưởng nhóm Tuyển dụng VP · Quản trị viên'),
- ('NV-002','Vũ Văn Cường','VC','0912 000 002','recruiter','Chuyên viên tuyển dụng'),
- ('NV-003','Đỗ Minh Thắng','ĐT','0912 000 003','recruiter','Chuyên viên tuyển dụng'),
- ('NV-004','Nguyễn Tiến Đạt','NĐ','0912 000 004','team_lead','Trưởng nhóm Tuyển dụng HN'),
- ('NV-005','Giám đốc (mẫu)','GĐ','0912 000 005','director','Giám đốc'),
- ('NV-006','Kế toán (mẫu)','KT','0912 000 006','accountant','Kế toán'),
- ('NV-007','Điều phối (mẫu)','ĐP','0912 000 007','coordinator','Điều phối viên đưa đón');
+-- ---------- [N1][N2] Phòng ban & vị trí ----------
+INSERT INTO departments (code, name, sort_order) VALUES
+ ('PB-BGD','Ban Giám đốc',1),
+ ('PB-TD','Phòng Tuyển dụng',2),
+ ('PB-DP','Phòng Điều phối',3),
+ ('PB-KT','Phòng Kế toán',4),
+ ('PB-HC','Phòng Hành chính - IT',5);
 
-INSERT INTO teams (code, name, region, leader_id) VALUES
- ('TD-VP','Tuyển dụng Vĩnh Phúc','Vĩnh Phúc',(SELECT id FROM staff WHERE code='NV-001')),
- ('TD-HN','Tuyển dụng Hà Nội','Hà Nội',     (SELECT id FROM staff WHERE code='NV-004'));
+INSERT INTO job_positions (code, name, department_id, level, default_role, description, sort_order)
+SELECT x.code, x.name, d.id, x.lvl, x.role::staff_role, x.descr, x.ord
+FROM (VALUES
+ ('VT-GD',  'Giám đốc',               'PB-BGD',1,'director',       'Điều hành chung, duyệt tài chính, xem hoa hồng',1),
+ ('VT-PGD', 'Phó Giám đốc',           'PB-BGD',2,'deputy_director','Phụ trách vận hành cung ứng',2),
+ ('VT-TNTD','Trưởng nhóm tuyển dụng', 'PB-TD', 3,'team_lead',      'Quản lý nhóm, giao chỉ tiêu, duyệt tạm ứng',1),
+ ('VT-CVTD','Chuyên viên tuyển dụng', 'PB-TD', 5,'recruiter',      'Tuyển và theo dõi người lao động',2),
+ ('VT-DPV', 'Điều phối viên',         'PB-DP', 5,'coordinator',    'Đưa đón, bàn giao, chấm công tại nhà máy',1),
+ ('VT-KTT', 'Kế toán trưởng',         'PB-KT', 3,'accountant',     'Chốt lương, thu chi',1),
+ ('VT-KTV', 'Kế toán viên',           'PB-KT', 5,'accountant',     'Nhập lương, tạm ứng',2),
+ ('VT-QTHT','Quản trị hệ thống',      'PB-HC', 4,'admin',          'Quản lý tài khoản, phân quyền, danh mục',1)
+) x(code,name,dept,lvl,role,descr,ord)
+JOIN departments d ON d.code = x.dept;
+
+-- ---------- Nhân sự: chọn vị trí → trigger tự điền phòng ban + quyền ----------
+INSERT INTO staff (code, full_name, initials, phone, job_position_id, title, gender, hire_date, probation_end, work_status, username)
+SELECT x.code, x.name, x.ini, x.phone, jp.id, x.title, x.gender::gender_type, x.hire::date, x.prob::date,
+       x.ws::staff_work_status, x.username
+FROM (VALUES
+ ('NV-001','Trần Thu Hà','TH','0988 123 456','VT-TNTD','Trưởng nhóm Tuyển dụng VP · Quản trị viên','female','2024-03-01',NULL,'official','tranthuha'),
+ ('NV-002','Vũ Văn Cường','VC','0912 000 002','VT-CVTD','Chuyên viên tuyển dụng','male','2025-01-06',NULL,'official','vuvancuong'),
+ ('NV-003','Đỗ Minh Thắng','ĐT','0912 000 003','VT-CVTD','Chuyên viên tuyển dụng','male','2026-08-01','2026-10-31','probation','dominhthang'),
+ ('NV-004','Nguyễn Tiến Đạt','NĐ','0912 000 004','VT-TNTD','Trưởng nhóm Tuyển dụng HN','male','2024-06-03',NULL,'official','nguyentiendat'),
+ ('NV-005','Giám đốc (mẫu)','GĐ','0912 000 005','VT-GD','Giám đốc',NULL,'2023-01-02',NULL,'official','giamdoc'),
+ ('NV-006','Kế toán (mẫu)','KT','0912 000 006','VT-KTT','Kế toán',NULL,'2023-05-02',NULL,'official','ketoan'),
+ ('NV-007','Điều phối (mẫu)','ĐP','0912 000 007','VT-DPV','Điều phối viên đưa đón',NULL,'2025-09-01',NULL,'official',NULL)
+) x(code,name,ini,phone,pos,title,gender,hire,prob,ws,username)
+JOIN job_positions jp ON jp.code = x.pos
+ORDER BY x.code;
+
+UPDATE staff s SET manager_staff_id = m.id
+FROM (VALUES ('NV-001','NV-005'),('NV-002','NV-001'),('NV-003','NV-001'),('NV-004','NV-005'),
+             ('NV-006','NV-005'),('NV-007','NV-001')) x(staff_code, manager_code)
+JOIN staff m ON m.code = x.manager_code
+WHERE s.code = x.staff_code;
+
+UPDATE departments d SET manager_staff_id = s.id
+FROM (VALUES ('PB-BGD','NV-005'),('PB-TD','NV-001'),('PB-KT','NV-006')) x(dept, staff_code)
+JOIN staff s ON s.code = x.staff_code
+WHERE d.code = x.dept;
+
+-- Tài khoản mẫu: Giám đốc và Trần Thu Hà đã có tài khoản (auth_user_id giả lập; trên Supabase do Edge Function tạo)
+UPDATE staff SET auth_user_id = x.uid::uuid, login_email = x.email,
+       must_change_password = x.must, password_changed_at = CASE WHEN NOT x.must THEN now() END
+FROM (VALUES ('NV-005','00000000-0000-0000-0000-000000000005','giamdoc@trangway.local',false),
+             ('NV-001','00000000-0000-0000-0000-000000000001','hatt@trangway.vn',false),
+             ('NV-002','00000000-0000-0000-0000-000000000002','vuvancuong@trangway.local',true)) x(code,uid,email,must)
+WHERE staff.code = x.code;
+
+INSERT INTO teams (code, name, region, department_id, leader_id) VALUES
+ ('TD-VP','Tuyển dụng Vĩnh Phúc','Vĩnh Phúc',(SELECT id FROM departments WHERE code='PB-TD'),(SELECT id FROM staff WHERE code='NV-001')),
+ ('TD-HN','Tuyển dụng Hà Nội','Hà Nội',     (SELECT id FROM departments WHERE code='PB-TD'),(SELECT id FROM staff WHERE code='NV-004'));
 
 INSERT INTO team_members (team_id, staff_id)
 SELECT t.id, s.id FROM teams t JOIN staff s ON
